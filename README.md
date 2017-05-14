@@ -1,0 +1,2 @@
+# scicalc
+Akademia c#
