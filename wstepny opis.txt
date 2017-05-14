@@ -1,0 +1,10 @@
+Kalkulator naukowy.
+
+* Podstawowe operatory (+-*/%)
+* potęgi, pierwiastki, nawiasy, ułamki
+* typowe funkcje (trygonometryczne, logarytmy, mod)
+* stałe (matematyczne lub definiowawlne, np "x^2+x gdzie x=3")
+* obsługa wyrażeń matematycznych (wpisywane jest całe wyrażenie, potem parsowane zgodnie z zasadami i obliczany wynik)
+* historia wyników
+
+technologia: WPF
