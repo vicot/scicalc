@@ -201,14 +201,9 @@ namespace SciCalc.Tests
         public void OperatorModulo()
         {
             var parser = new Parser();
-            parser.Parse("5mod2");
+            parser.Parse("5m2");
             var result = parser.Solve();
             double expected = 1;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.Parse("5mod3.5");
-            result = parser.Solve();
-            expected = double.NaN;
             Assert.That(result, Is.EqualTo(expected));
         }
 
@@ -221,7 +216,7 @@ namespace SciCalc.Tests
             double expected = Math.Sin(17);
             Assert.That(result, Is.EqualTo(expected));
 
-            parser.Parse("sin(pi/2)");
+            parser.Parse("sin(PI/2)");
             result = parser.Solve();
             expected = Math.Sin(Math.PI / 2);
             Assert.That(result, Is.EqualTo(expected));
@@ -236,7 +231,7 @@ namespace SciCalc.Tests
             double expected = Math.Cos(17);
             Assert.That(result, Is.EqualTo(expected));
 
-            parser.Parse("cos(pi/2)");
+            parser.Parse("cos(PI/2)");
             result = parser.Solve();
             expected = Math.Cos(Math.PI/2);
             Assert.That(result, Is.EqualTo(expected));
@@ -251,7 +246,7 @@ namespace SciCalc.Tests
             double expected = Math.Tan(17);
             Assert.That(result, Is.EqualTo(expected));
 
-            parser.Parse("tan(pi/2)");
+            parser.Parse("tan(PI/2)");
             result = parser.Solve();
             expected = Math.Tan(Math.PI / 2);
             Assert.That(result, Is.EqualTo(expected));
@@ -266,7 +261,7 @@ namespace SciCalc.Tests
             double expected = 1/Math.Tan(17);
             Assert.That(result, Is.EqualTo(expected));
 
-            parser.Parse("ctg(pi/2)");
+            parser.Parse("ctg(PI/2)");
             result = parser.Solve();
             expected = 1 /Math.Tan(Math.PI / 2);
             Assert.That(result, Is.EqualTo(expected));
@@ -281,7 +276,7 @@ namespace SciCalc.Tests
             double expected = Math.Log(7);
             Assert.That(result, Is.EqualTo(expected));
             
-            parser.Parse("ln(e^2)");
+            parser.Parse("ln(E^2)");
             result = parser.Solve();
             expected = 2;
             Assert.That(result, Is.EqualTo(expected));

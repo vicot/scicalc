@@ -5,21 +5,26 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using SciCalc.Tokens;
+using SciCalc.Tokens.Functions;
 using SciCalc.Tokens.Operators;
 
 namespace SciCalc {
     public class Parser {
         public Parser()
         {
-            Variables = new Dictionary<string, double>();
+            Variables = new Dictionary<string, double>()
+            {
+                {"PI", Math.PI},
+                {"E", Math.E},
+            };
             rpn = new Stack<Token>();
             operators = new Stack<Token>();
         }
 
         public Dictionary<string, double> Variables { get; private set; }
 
-        private Stack<Token> rpn;
-        private Stack<Token> operators;
+        private readonly Stack<Token> rpn;
+        private readonly Stack<Token> operators;
         
 
         public void SetVariable(string name, double value)
@@ -94,7 +99,20 @@ namespace SciCalc {
                 }
                 else if (c >= 'A' && c <= 'Z') //variables
                 {
-                    throw new NotImplementedException("Variables are not supported yet");
+                    switch (state)
+                    {
+                        case ParseState.None:
+                            startPosition = pos;
+                            state = ParseState.Variable;
+                            break;
+
+                        case ParseState.Variable:
+                            break; // continue reading name
+
+                        default:
+                            endWord = true;
+                            break;
+                    }
                 }
                 else if (c >= 'a' && c <= 'z') //functions
                 {
@@ -113,23 +131,32 @@ namespace SciCalc {
                             break;
                     }
                 }
+                else if (c == ')')
+                {
+                    if (state == ParseState.None)
+                    {
+                        while (true)
+                        {
+                            if (operators.Count == 0)
+                            {
+                                throw new ParseException("Unexpected ')'. Does not match with any '('");
+                            }
+
+                            var token = operators.Pop();
+                            if (token is ParentOperator) break;
+                            rpn.Push(token);
+                        }
+                    }
+                    else
+                    {
+                        endWord = true;
+                    }
+                }
                 else //operator
                 {
                     if (state == ParseState.None)
                     {
-
-                        var op = OperatorFactory.GetToken(c);
-                        if (operators.Count > 0)
-                        {
-                            var top = operators.Peek();
-                            if (top.Priority > op.Priority)
-                            {
-                                while (operators.Count > 0) rpn.Push(operators.Pop());
-                            }
-
-                        }
-
-                        operators.Push(op);
+                        PushNewOperator(c);
                     }
                     else
                     {
@@ -140,15 +167,7 @@ namespace SciCalc {
                 if (endWord)
                 {
                     endWord = false;
-                    switch (state)
-                    {
-                        case ParseState.ValueInteger:
-                        case ParseState.ValueDouble:
-                            rpn.Push(new Value(double.Parse(expression.Substring(startPosition, pos - startPosition))));
-                            break;
-
-
-                    }
+                    PushLongToken(expression, state, startPosition, pos);
 
                     state = ParseState.None;
                     --pos; //scan the character again
@@ -157,18 +176,79 @@ namespace SciCalc {
             }
 
             //finish parsing last token
-            switch (state) {
-                case ParseState.ValueInteger:
-                case ParseState.ValueDouble:
-                    rpn.Push(new Value(double.Parse(expression.Substring(startPosition, expression.Length - startPosition))));
-                    break;
-
-
-            }
+            PushLongToken(expression, state, startPosition, expression.Length);
 
             //copy remaining operators to RPN stack
             while (operators.Count > 0) rpn.Push(operators.Pop());
 
+        }
+
+        private void PushLongToken(string expression, ParseState state, int startPosition, int endPosition)
+        {
+            var tokenstring = expression.Substring(startPosition, endPosition - startPosition);
+            switch (state)
+            {
+                case ParseState.ValueInteger:
+                case ParseState.ValueDouble:
+                    rpn.Push(new Value(double.Parse(tokenstring)));
+                    break;
+
+                case ParseState.Variable:
+                    if (Variables.ContainsKey(tokenstring))
+                    {
+                        rpn.Push(new Value(Variables[tokenstring]));
+                    }
+                    else
+                    {
+                        throw new ParseException($"Variable '{tokenstring}' is undefined.");
+                    }
+                    break;
+
+                case ParseState.Function:
+                {
+                    if (tokenstring == "m")
+                    {
+                        PushNewOperator(tokenstring[0]);
+                    }
+                    else
+                    {
+                        PushNewFunction(tokenstring);
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        private void PushNewFunction(string name)
+        {
+            var op = FunctionFactory.GetToken(name);
+            if (operators.Count > 0)
+            {
+                var top = operators.Peek();
+                if (top.Priority > op.Priority)
+                {
+                    while (operators.Count > 0) rpn.Push(operators.Pop());
+                }
+            }
+
+            operators.Push(op);
+        }
+
+        private void PushNewOperator(char c)
+        {
+            var op = OperatorFactory.GetToken(c);
+
+            if (op.Priority > 0 && operators.Count > 0)
+            {
+                var top = operators.Peek();
+                if (top.Priority > op.Priority)
+                {
+                    while (operators.Count > 0) rpn.Push(operators.Pop());
+                }
+            }
+
+            operators.Push(op);
         }
 
         public double Solve()
@@ -182,7 +262,7 @@ namespace SciCalc {
                 {
                     results.Push(token.Value);
                 }
-                else if(token is Operator)
+                else if(token is Operator || token is Function)
                 {
                     if (token.ArgumentCount == 1)
                     {
@@ -196,6 +276,7 @@ namespace SciCalc {
                         results.Push(token.Execute(arg1, arg2));
                     }
                 }
+                
             }
 
             if (results.Count != 1)
