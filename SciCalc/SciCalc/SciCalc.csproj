@@ -54,6 +54,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Tokens\Operators\Operator.cs" />
+    <Compile Include="Tokens\Operators\OperatorFactory.cs" />
+    <Compile Include="Tokens\Operators\PercentOperator.cs" />
+    <Compile Include="Tokens\Operators\RootOperator.cs" />
+    <Compile Include="Tokens\Operators\ModOperator.cs" />
+    <Compile Include="Tokens\Operators\PowerOperator.cs" />
+    <Compile Include="Tokens\Operators\ParentOperator.cs" />
+    <Compile Include="Tokens\Operators\MulOperator.cs" />
+    <Compile Include="Tokens\Operators\DivOperator.cs" />
+    <Compile Include="Tokens\Operators\FactorialOperator.cs" />
+    <Compile Include="Tokens\Operators\NegateOperator.cs" />
+    <Compile Include="Tokens\Operators\SubOperator.cs" />
+    <Compile Include="Tokens\Operators\SumOperator.cs" />
+    <Compile Include="ParseException.cs" />
+    <Compile Include="Token.cs" />
+    <Compile Include="Tokens\Value.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -62,7 +78,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="CustomVariable.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -94,6 +109,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Tokens\Functions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
