@@ -15,7 +15,7 @@ namespace SciCalc.Tokens.Operators
                 case 'm': return new ModOperator();
                 case '^': return new PowerOperator();
                 case '%': return new PercentOperator();
-                case '√': return new RootOperator();
+                case '√': return new RootOperator(alternative);
                 case '!': return new FactorialOperator();
                 case '(': return new ParentOperator();
                 default: throw new ArgumentException($"'{name}' is not a valid operator.");

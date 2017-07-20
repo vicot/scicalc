@@ -6,7 +6,7 @@ namespace SciCalc.Tokens.Functions
     {
         public CtgFunction() : base()
         {
-            this.Symbol = "ctg";
+            this.Symbol = " ctg";
             this.ArgumentCount = 1;
         }
 

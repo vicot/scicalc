@@ -6,7 +6,7 @@
         {
             this.ArgumentCount = 2;
             this.Priority = 0;
-            this.Symbol = "(";
+            this.Symbol = " (";
         }
     }
 }

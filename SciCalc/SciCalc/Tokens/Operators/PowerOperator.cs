@@ -8,7 +8,7 @@ namespace SciCalc.Tokens.Operators
         {
             this.ArgumentCount = 2;
             this.Priority = 3;
-            this.Symbol = "^";
+            this.Symbol = " ^ ";
         }
 
         public override double Execute(double arg1, double arg2) {

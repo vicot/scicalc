@@ -6,7 +6,7 @@ namespace SciCalc.Tokens.Functions
     {
         public TanFunction() : base()
         {
-            this.Symbol = "tan";
+            this.Symbol = " tan";
             this.ArgumentCount = 1;
         }
 

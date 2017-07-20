@@ -5,8 +5,103 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SciCalc"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="525" Background="DarkGray">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*"/>
+
+            <ColumnDefinition Width="5"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="120"/>
+            <RowDefinition Height="*"/>
+
+        </Grid.RowDefinitions>
+
+        <Border Grid.Column="1" Grid.Row="1" Background="White">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="3*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox Name="EquationBox" Grid.Row="0" Background="Transparent" BorderThickness="0" Text="5+ 3-2*6-   sin(7 )" FontSize="10"/>
+                <TextBox Name="ResultBox" Grid.Row="1" Background="Transparent" BorderThickness="0" Text="5 + 3 - 2 * 6 - log(7)" FontSize="20" HorizontalContentAlignment="Right" VerticalContentAlignment="Bottom"/>
+                
+            </Grid>
+        </Border>
+        
+        <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+            <Button Content="sin" Padding="20,0" Margin="2,0"/>
+            <Button Content="cos" Padding="20,0" Margin="2,0"/>
+            <Button Content="tan" Padding="20,0" Margin="2,0"/>
+            <Button Content="ctg" Padding="20,0" Margin="2,0"/>
+            <Button Content="ln" Padding="20,0" Margin="20,0,2,0"/>
+            <Button Content="log" Padding="20,0" Margin="2,0"/>
+        </StackPanel>
+        
+        <Grid Grid.Row="5" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+
+            <Button Grid.Row="0" Grid.Column="1" Margin="1" Content="7"/>
+            <Button Grid.Row="0" Grid.Column="2" Margin="1" Content="8"/>
+            <Button Grid.Row="0" Grid.Column="3" Margin="1" Content="9"/>
+            <Button Grid.Row="0" Grid.Column="4" Margin="1" Content="/"/>
+
+            <Button Grid.Row="1" Grid.Column="1" Margin="1" Content="4"/>
+            <Button Grid.Row="1" Grid.Column="2" Margin="1" Content="5"/>
+            <Button Grid.Row="1" Grid.Column="3" Margin="1" Content="6"/>
+            <Button Grid.Row="1" Grid.Column="4" Margin="1" Content="*"/>
+
+            <Button Grid.Row="2" Grid.Column="1" Margin="1" Content="1"/>
+            <Button Grid.Row="2" Grid.Column="2" Margin="1" Content="2"/>
+            <Button Grid.Row="2" Grid.Column="3" Margin="1" Content="3"/>
+            <Button Grid.Row="2" Grid.Column="4" Margin="1" Content="-"/>
+
+            <Button Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Content="0"/>
+<!--            <Button Grid.Row="3" Grid.Column="2" Margin="1" Content="7"/>-->
+            <Button Grid.Row="3" Grid.Column="3" Margin="1" Content="."/>
+            <Button Grid.Row="3" Grid.Column="4" Margin="1" Content="+"/>
+
+
+            <Button Grid.Row="0" Grid.Column="6" Margin="1" Content="!"/>
+            <Button Grid.Row="0" Grid.Column="7" Margin="1" Content="m"/>
+
+            <Button Grid.Row="1" Grid.Column="6" Margin="1" Content="^"/>
+            <Button Grid.Row="1" Grid.Column="7" Margin="1" Content="√"/>
+            
+            <Button Grid.Row="2" Grid.Column="6" Margin="1" Content="%"/>
+            <Button Grid.Row="2" Grid.Column="7" Margin="1" Content="-"/>
+
+            <Button Grid.Row="3" Grid.Column="6" Margin="1" Content="("/>
+            <Button Grid.Row="3" Grid.Column="7" Margin="1" Content=")"/>
+            
+            <Button Grid.Row="3" Grid.Column="9" Margin="1" Content="=" Click="SolveButton_Click"/>
+        </Grid>
         
     </Grid>
 </Window>

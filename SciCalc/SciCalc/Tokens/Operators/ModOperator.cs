@@ -6,7 +6,7 @@
         {
             this.ArgumentCount = 2;
             this.Priority = 2;
-            this.Symbol = "m";
+            this.Symbol = " m ";
         }
 
         public override double Execute(double arg1, double arg2) {

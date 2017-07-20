@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,15 @@ namespace SciCalc {
     public partial class MainWindow : Window {
         public MainWindow() {
             InitializeComponent();
+        }
+
+        private void SolveButton_Click(object sender, RoutedEventArgs e)
+        {
+            EquationBox.Text = EquationBox.Text.Replace(" ", "");
+
+            var p =new Parser();
+            p.Parse(EquationBox.Text);
+            ResultBox.Text = p.Solve().ToString(CultureInfo.InvariantCulture);
         }
     }
 }

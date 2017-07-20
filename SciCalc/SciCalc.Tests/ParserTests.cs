@@ -113,22 +113,22 @@ namespace SciCalc.Tests
 
             parser.Parse("10+30%");
             result = parser.Solve();
-            expected = 13;
+            expected = 10.3;
             Assert.That(result, Is.EqualTo(expected));
 
             parser.Parse("5+5+30%");
             result = parser.Solve();
-            expected = 13;
+            expected = 10.3;
             Assert.That(result, Is.EqualTo(expected));
 
             parser.Parse("5+5+30%+5");
             result = parser.Solve();
-            expected = 19.5;
+            expected = 15.3;
             Assert.That(result, Is.EqualTo(expected));
 
             parser.Parse("5*50%");
             result = parser.Solve();
-            expected = 7.5;
+            expected = 2.5;
             Assert.That(result, Is.EqualTo(expected));
 
             parser.Parse("3+5*200%");
@@ -138,7 +138,7 @@ namespace SciCalc.Tests
 
             parser.Parse("10-30%");
             result = parser.Solve();
-            expected = 7;
+            expected = 9.7;
             Assert.That(result, Is.EqualTo(expected));
 
 
@@ -336,15 +336,23 @@ namespace SciCalc.Tests
 
             parser.Parse("3+2+50%+5");
             result = parser.Solve();
-            expected = 15;
-            Assert.That(expected, Is.EqualTo(result), "percent should added to result of the whole block");
+            expected = 10.5;
+            Assert.That(expected, Is.EqualTo(result), "percent should only affect the 50");
 
             parser.Parse("√4+5");
             result = parser.Solve();
             expected = 7;
             Assert.That(expected, Is.EqualTo(result), "sum before root");
 
+            parser.Parse("(5-3)√4+5");
+            result = parser.Solve();
+            expected = 7;
+            Assert.That(expected, Is.EqualTo(result), "should solve 5-3 first to create square root");
 
+            parser.Parse("3+7*log3(7+2)-8");
+            result = parser.Solve();
+            expected = 9;
+            Assert.That(expected, Is.EqualTo(result), "");
         }
 
     }

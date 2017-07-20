@@ -25,6 +25,7 @@ namespace SciCalc {
 
         private readonly Stack<Token> rpn;
         private readonly Stack<Token> operators;
+        private Token lastToken;
         
 
         public void SetVariable(string name, double value)
@@ -49,7 +50,7 @@ namespace SciCalc {
         {
             operators.Clear();
             rpn.Clear();
-
+            lastToken = null;
 
             ParseState state = ParseState.None;
             int startPosition = 0;
@@ -190,13 +191,15 @@ namespace SciCalc {
             {
                 case ParseState.ValueInteger:
                 case ParseState.ValueDouble:
-                    rpn.Push(new Value(double.Parse(tokenstring)));
+                    lastToken = new Value(double.Parse(tokenstring));
+                    rpn.Push(lastToken);
                     break;
 
                 case ParseState.Variable:
                     if (Variables.ContainsKey(tokenstring))
                     {
-                        rpn.Push(new Value(Variables[tokenstring]));
+                        lastToken = new Value(Variables[tokenstring]);
+                        rpn.Push(lastToken);
                     }
                     else
                     {
@@ -233,11 +236,12 @@ namespace SciCalc {
             }
 
             operators.Push(op);
+            lastToken = op;
         }
 
         private void PushNewOperator(char c)
         {
-            var op = OperatorFactory.GetToken(c);
+            var op = OperatorFactory.GetToken(c, lastToken == null || lastToken is Operator);
 
             if (op.Priority > 0 && operators.Count > 0)
             {
@@ -249,6 +253,7 @@ namespace SciCalc {
             }
 
             operators.Push(op);
+            lastToken = op;
         }
 
         public double Solve()

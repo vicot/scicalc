@@ -6,7 +6,7 @@ namespace SciCalc.Tokens.Functions
     {
         public SinFunction() : base()
         {
-            this.Symbol = "sin";
+            this.Symbol = " sin";
             this.ArgumentCount = 1;
         }
 
