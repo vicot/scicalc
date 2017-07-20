@@ -2,7 +2,7 @@
 {
     public class PercentOperator : Operator
     {
-        public PercentOperator() : base()
+        public PercentOperator()
         {
             this.ArgumentCount = 1;
             this.Priority = 4;

@@ -2,7 +2,7 @@
 {
     public class ParentOperator : Operator
     {
-        public ParentOperator() : base()
+        public ParentOperator()
         {
             this.ArgumentCount = 2;
             this.Priority = 0;

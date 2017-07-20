@@ -1,35 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace SciCalc {
+namespace SciCalc
+{
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window {
-        public MainWindow() {
-            InitializeComponent();
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            this.InitializeComponent();
         }
 
         private void SolveButton_Click(object sender, RoutedEventArgs e)
         {
-            EquationBox.Text = EquationBox.Text.Replace(" ", "");
+            this.EquationBox.Text = this.EquationBox.Text.Replace(" ", "");
 
-            var p =new Parser();
-            p.Parse(EquationBox.Text);
-            ResultBox.Text = p.Solve().ToString(CultureInfo.InvariantCulture);
+            var p = new Parser();
+            p.Parse(this.EquationBox.Text);
+            this.ResultBox.Text = p.Solve().ToString(CultureInfo.InvariantCulture);
         }
     }
 }

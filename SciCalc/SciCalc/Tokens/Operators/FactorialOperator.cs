@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace SciCalc.Tokens.Operators
+﻿namespace SciCalc.Tokens.Operators
 {
     public class FactorialOperator : Operator
     {
-        public FactorialOperator() : base()
+        public FactorialOperator()
         {
             this.ArgumentCount = 1;
             this.Priority = 4;
@@ -18,6 +16,7 @@ namespace SciCalc.Tokens.Operators
             {
                 result *= arg--;
             }
+
             return result;
         }
     }

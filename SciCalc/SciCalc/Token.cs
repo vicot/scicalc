@@ -28,5 +28,4 @@ namespace SciCalc
         Function,
         Constant
     }
-
 }

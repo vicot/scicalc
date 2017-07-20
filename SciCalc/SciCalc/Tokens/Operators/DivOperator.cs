@@ -2,14 +2,15 @@
 {
     public class DivOperator : Operator
     {
-        public DivOperator() : base()
+        public DivOperator()
         {
             this.ArgumentCount = 2;
             this.Priority = 2;
             this.Symbol = " / ";
         }
 
-        public override double Execute(double arg1, double arg2) {
+        public override double Execute(double arg1, double arg2)
+        {
             return arg1 / arg2;
         }
     }

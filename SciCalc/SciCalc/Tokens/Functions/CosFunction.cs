@@ -4,7 +4,7 @@ namespace SciCalc.Tokens.Functions
 {
     public class CosFunction : Function
     {
-        public CosFunction() : base()
+        public CosFunction()
         {
             this.Symbol = " cos";
             this.ArgumentCount = 1;

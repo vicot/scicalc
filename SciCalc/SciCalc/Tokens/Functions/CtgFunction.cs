@@ -4,7 +4,7 @@ namespace SciCalc.Tokens.Functions
 {
     public class CtgFunction : Function
     {
-        public CtgFunction() : base()
+        public CtgFunction()
         {
             this.Symbol = " ctg";
             this.ArgumentCount = 1;
@@ -12,7 +12,7 @@ namespace SciCalc.Tokens.Functions
 
         public override double Execute(double arg)
         {
-            return 1.0/Math.Tan(arg);
+            return 1.0 / Math.Tan(arg);
         }
     }
 }

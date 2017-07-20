@@ -2,7 +2,7 @@
 {
     public class NegateOperator : Operator
     {
-        public NegateOperator() : base()
+        public NegateOperator()
         {
             this.ArgumentCount = 1;
             this.Priority = 4;

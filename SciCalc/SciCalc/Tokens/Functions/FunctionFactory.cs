@@ -8,13 +8,20 @@ namespace SciCalc.Tokens.Functions
         {
             switch (name)
             {
-                case "sin": return new SinFunction();
-                case "cos": return new CosFunction();
-                case "tan": return new TanFunction();
-                case "ctg": return new CtgFunction();
-                case "ln": return new LnFunction();
-                case "log": return new LogFunction();
-                default: throw new ArgumentException($"'{name}' is not a valid function.");
+                case "sin":
+                    return new SinFunction();
+                case "cos":
+                    return new CosFunction();
+                case "tan":
+                    return new TanFunction();
+                case "ctg":
+                    return new CtgFunction();
+                case "ln":
+                    return new LnFunction();
+                case "log":
+                    return new LogFunction();
+                default:
+                    throw new ArgumentException($"'{name}' is not a valid function.");
             }
         }
     }

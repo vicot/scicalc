@@ -4,15 +4,16 @@ namespace SciCalc.Tokens.Operators
 {
     public class PowerOperator : Operator
     {
-        public PowerOperator() : base()
+        public PowerOperator()
         {
             this.ArgumentCount = 2;
             this.Priority = 3;
             this.Symbol = " ^ ";
         }
 
-        public override double Execute(double arg1, double arg2) {
-            return Math.Pow(arg1,arg2);
+        public override double Execute(double arg1, double arg2)
+        {
+            return Math.Pow(arg1, arg2);
         }
     }
 }

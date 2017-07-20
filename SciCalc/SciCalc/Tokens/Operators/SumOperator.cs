@@ -2,7 +2,7 @@
 {
     public class SumOperator : Operator
     {
-        public SumOperator() : base()
+        public SumOperator()
         {
             this.ArgumentCount = 2;
             this.Priority = 1;

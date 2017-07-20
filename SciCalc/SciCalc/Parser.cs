@@ -1,65 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using SciCalc.Tokens;
 using SciCalc.Tokens.Functions;
 using SciCalc.Tokens.Operators;
 
-namespace SciCalc {
-    public class Parser {
-        public Parser()
-        {
-            Variables = new Dictionary<string, double>()
-            {
-                {"PI", Math.PI},
-                {"E", Math.E},
-            };
-            rpn = new Stack<Token>();
-            operators = new Stack<Token>();
-        }
-
-        public Dictionary<string, double> Variables { get; private set; }
+namespace SciCalc
+{
+    public class Parser
+    {
+        private readonly Stack<Token> operators;
 
         private readonly Stack<Token> rpn;
-        private readonly Stack<Token> operators;
         private Token lastToken;
-        
+
+        public Parser()
+        {
+            this.Variables = new Dictionary<string, double>
+            {
+                {"PI", Math.PI},
+                {"E", Math.E}
+            };
+            this.rpn = new Stack<Token>();
+            this.operators = new Stack<Token>();
+        }
+
+        public Dictionary<string, double> Variables { get; }
+
 
         public void SetVariable(string name, double value)
         {
-            Variables[name] = value;
+            this.Variables[name] = value;
         }
 
         public bool UnsetVariable(string name)
         {
-            return Variables.Remove(name);
-        }
-
-        private enum ParseState {
-            None,
-            ValueInteger,
-            ValueDouble,
-            Variable,
-            Function,
+            return this.Variables.Remove(name);
         }
 
         public void Parse(string expression)
         {
-            operators.Clear();
-            rpn.Clear();
-            lastToken = null;
+            this.operators.Clear();
+            this.rpn.Clear();
+            this.lastToken = null;
 
-            ParseState state = ParseState.None;
-            int startPosition = 0;
-            bool endWord = false;
+            var state = ParseState.None;
+            var startPosition = 0;
+            var endWord = false;
 
 
             for (var pos = 0; pos < expression.Length; ++pos)
             {
-                var c = expression[pos];
+                char c = expression[pos];
                 if (c >= '0' && c <= '9') //numbers
                 {
                     switch (state)
@@ -138,14 +130,18 @@ namespace SciCalc {
                     {
                         while (true)
                         {
-                            if (operators.Count == 0)
+                            if (this.operators.Count == 0)
                             {
                                 throw new ParseException("Unexpected ')'. Does not match with any '('");
                             }
 
-                            var token = operators.Pop();
-                            if (token is ParentOperator) break;
-                            rpn.Push(token);
+                            Token token = this.operators.Pop();
+                            if (token is ParentOperator)
+                            {
+                                break;
+                            }
+
+                            this.rpn.Push(token);
                         }
                     }
                     else
@@ -157,7 +153,7 @@ namespace SciCalc {
                 {
                     if (state == ParseState.None)
                     {
-                        PushNewOperator(c);
+                        this.PushNewOperator(c);
                     }
                     else
                     {
@@ -168,54 +164,56 @@ namespace SciCalc {
                 if (endWord)
                 {
                     endWord = false;
-                    PushLongToken(expression, state, startPosition, pos);
+                    this.PushLongToken(expression, state, startPosition, pos);
 
                     state = ParseState.None;
                     --pos; //scan the character again
                 }
-
             }
 
             //finish parsing last token
-            PushLongToken(expression, state, startPosition, expression.Length);
+            this.PushLongToken(expression, state, startPosition, expression.Length);
 
             //copy remaining operators to RPN stack
-            while (operators.Count > 0) rpn.Push(operators.Pop());
-
+            while (this.operators.Count > 0)
+            {
+                this.rpn.Push(this.operators.Pop());
+            }
         }
 
         private void PushLongToken(string expression, ParseState state, int startPosition, int endPosition)
         {
-            var tokenstring = expression.Substring(startPosition, endPosition - startPosition);
+            string tokenstring = expression.Substring(startPosition, endPosition - startPosition);
             switch (state)
             {
                 case ParseState.ValueInteger:
                 case ParseState.ValueDouble:
-                    lastToken = new Value(double.Parse(tokenstring));
-                    rpn.Push(lastToken);
+                    this.lastToken = new Value(double.Parse(tokenstring));
+                    this.rpn.Push(this.lastToken);
                     break;
 
                 case ParseState.Variable:
-                    if (Variables.ContainsKey(tokenstring))
+                    if (this.Variables.ContainsKey(tokenstring))
                     {
-                        lastToken = new Value(Variables[tokenstring]);
-                        rpn.Push(lastToken);
+                        this.lastToken = new Value(this.Variables[tokenstring]);
+                        this.rpn.Push(this.lastToken);
                     }
                     else
                     {
                         throw new ParseException($"Variable '{tokenstring}' is undefined.");
                     }
+
                     break;
 
                 case ParseState.Function:
                 {
                     if (tokenstring == "m")
                     {
-                        PushNewOperator(tokenstring[0]);
+                        this.PushNewOperator(tokenstring[0]);
                     }
                     else
                     {
-                        PushNewFunction(tokenstring);
+                        this.PushNewFunction(tokenstring);
                     }
 
                     break;
@@ -225,63 +223,68 @@ namespace SciCalc {
 
         private void PushNewFunction(string name)
         {
-            var op = FunctionFactory.GetToken(name);
-            if (operators.Count > 0)
+            Token op = FunctionFactory.GetToken(name);
+            if (this.operators.Count > 0)
             {
-                var top = operators.Peek();
+                Token top = this.operators.Peek();
                 if (top.Priority > op.Priority)
                 {
-                    while (operators.Count > 0) rpn.Push(operators.Pop());
+                    while (this.operators.Count > 0)
+                    {
+                        this.rpn.Push(this.operators.Pop());
+                    }
                 }
             }
 
-            operators.Push(op);
-            lastToken = op;
+            this.operators.Push(op);
+            this.lastToken = op;
         }
 
         private void PushNewOperator(char c)
         {
-            var op = OperatorFactory.GetToken(c, lastToken == null || lastToken is Operator);
+            Token op = OperatorFactory.GetToken(c, this.lastToken == null || this.lastToken is Operator);
 
-            if (op.Priority > 0 && operators.Count > 0)
+            if (op.Priority > 0 && this.operators.Count > 0)
             {
-                var top = operators.Peek();
+                Token top = this.operators.Peek();
                 if (top.Priority > op.Priority)
                 {
-                    while (operators.Count > 0) rpn.Push(operators.Pop());
+                    while (this.operators.Count > 0)
+                    {
+                        this.rpn.Push(this.operators.Pop());
+                    }
                 }
             }
 
-            operators.Push(op);
-            lastToken = op;
+            this.operators.Push(op);
+            this.lastToken = op;
         }
 
         public double Solve()
         {
             var results = new Stack<double>();
-            var input = rpn.Reverse();
+            IEnumerable<Token> input = this.rpn.Reverse();
 
-            foreach (var token in input)
+            foreach (Token token in input)
             {
                 if (token is Value)
                 {
                     results.Push(token.Value);
                 }
-                else if(token is Operator || token is Function)
+                else if (token is Operator || token is Function)
                 {
                     if (token.ArgumentCount == 1)
                     {
-                        var arg = results.Pop();
+                        double arg = results.Pop();
                         results.Push(token.Execute(arg));
                     }
                     else
                     {
-                        var arg2 = results.Pop();
-                        var arg1 = results.Pop();
+                        double arg2 = results.Pop();
+                        double arg1 = results.Pop();
                         results.Push(token.Execute(arg1, arg2));
                     }
                 }
-                
             }
 
             if (results.Count != 1)
@@ -291,6 +294,14 @@ namespace SciCalc {
 
             return results.Pop();
         }
-    }
 
+        private enum ParseState
+        {
+            None,
+            ValueInteger,
+            ValueDouble,
+            Variable,
+            Function
+        }
+    }
 }

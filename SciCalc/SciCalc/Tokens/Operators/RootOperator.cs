@@ -4,7 +4,7 @@ namespace SciCalc.Tokens.Operators
 {
     public class RootOperator : Operator
     {
-        public RootOperator(bool unary) : base()
+        public RootOperator(bool unary)
         {
             this.ArgumentCount = unary ? 1 : 2;
             this.Priority = 3;
@@ -20,6 +20,5 @@ namespace SciCalc.Tokens.Operators
         {
             return Math.Sqrt(arg);
         }
-
     }
 }
