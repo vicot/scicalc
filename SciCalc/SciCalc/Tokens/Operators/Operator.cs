@@ -1,8 +1,8 @@
 ﻿namespace SciCalc.Tokens.Operators
 {
-    public abstract class Operator : Token
+    public class Operator : Token
     {
-        protected Operator()
+        public Operator(string symbol) : base(symbol)
         {
             this.Type = TokenType.Operator;
             this.Value = 0.0;

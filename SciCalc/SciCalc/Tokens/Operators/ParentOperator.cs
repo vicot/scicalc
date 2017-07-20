@@ -2,11 +2,10 @@
 {
     public class ParentOperator : Operator
     {
-        public ParentOperator()
+        public ParentOperator() : base(" (")
         {
             this.ArgumentCount = 2;
             this.Priority = 0;
-            this.Symbol = " (";
         }
     }
 }

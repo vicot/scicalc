@@ -4,9 +4,8 @@ namespace SciCalc.Tokens.Functions
 {
     public class TanFunction : Function
     {
-        public TanFunction()
+        public TanFunction() : base("tan")
         {
-            this.Symbol = " tan";
             this.ArgumentCount = 1;
         }
 

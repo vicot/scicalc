@@ -2,11 +2,10 @@
 {
     public class ModOperator : Operator
     {
-        public ModOperator()
+        public ModOperator() : base(" m ")
         {
             this.ArgumentCount = 2;
             this.Priority = 2;
-            this.Symbol = " m ";
         }
 
         public override double Execute(double arg1, double arg2)

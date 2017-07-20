@@ -2,7 +2,7 @@
 {
     public class Function : Token
     {
-        protected Function()
+        public Function(string name) : base($" {name}")
         {
             this.Type = TokenType.Function;
             this.Value = 0.0;

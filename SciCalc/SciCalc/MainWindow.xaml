@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SciCalc"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" Background="DarkGray">
+        Title="MainWindow" Height="350" Width="525" Background="DarkGray" KeyDown="Window_KeyDown" TextInput="Window_TextInput">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="5" />
@@ -32,10 +32,12 @@
                 </Grid.RowDefinitions>
 
                 <TextBox Name="EquationBox" Grid.Row="0" Background="Transparent" BorderThickness="0"
-                         Text="5+ 3-2*6-   sin(7 )" FontSize="10" />
+                         Text="lnE" FontSize="10" IsReadOnly="True" IsReadOnlyCaretVisible="False" Focusable="False"
+                         Cursor="Arrow" />
                 <TextBox Name="ResultBox" Grid.Row="1" Background="Transparent" BorderThickness="0"
                          Text="5 + 3 - 2 * 6 - log(7)" FontSize="20" HorizontalContentAlignment="Right"
-                         VerticalContentAlignment="Bottom" />
+                         VerticalContentAlignment="Bottom" IsReadOnly="True" IsReadOnlyCaretVisible="True"
+                         Focusable="False" Cursor="Arrow" />
 
             </Grid>
         </Border>

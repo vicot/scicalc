@@ -11,7 +11,7 @@ namespace SciCalc
     {
         private readonly Stack<Token> operators;
 
-        private readonly Stack<Token> rpn;
+        public Stack<Token> PostfixNotation { get; }
         private Token lastToken;
 
         public Parser()
@@ -21,7 +21,7 @@ namespace SciCalc
                 {"PI", Math.PI},
                 {"E", Math.E}
             };
-            this.rpn = new Stack<Token>();
+            this.PostfixNotation = new Stack<Token>();
             this.operators = new Stack<Token>();
         }
 
@@ -41,7 +41,7 @@ namespace SciCalc
         public void Parse(string expression)
         {
             this.operators.Clear();
-            this.rpn.Clear();
+            this.PostfixNotation.Clear();
             this.lastToken = null;
 
             var state = ParseState.None;
@@ -141,7 +141,7 @@ namespace SciCalc
                                 break;
                             }
 
-                            this.rpn.Push(token);
+                            this.PostfixNotation.Push(token);
                         }
                     }
                     else
@@ -177,7 +177,7 @@ namespace SciCalc
             //copy remaining operators to RPN stack
             while (this.operators.Count > 0)
             {
-                this.rpn.Push(this.operators.Pop());
+                this.PostfixNotation.Push(this.operators.Pop());
             }
         }
 
@@ -189,14 +189,14 @@ namespace SciCalc
                 case ParseState.ValueInteger:
                 case ParseState.ValueDouble:
                     this.lastToken = new Value(double.Parse(tokenstring));
-                    this.rpn.Push(this.lastToken);
+                    this.PostfixNotation.Push(this.lastToken);
                     break;
 
                 case ParseState.Variable:
                     if (this.Variables.ContainsKey(tokenstring))
                     {
                         this.lastToken = new Value(this.Variables[tokenstring]);
-                        this.rpn.Push(this.lastToken);
+                        this.PostfixNotation.Push(this.lastToken);
                     }
                     else
                     {
@@ -231,7 +231,7 @@ namespace SciCalc
                 {
                     while (this.operators.Count > 0)
                     {
-                        this.rpn.Push(this.operators.Pop());
+                        this.PostfixNotation.Push(this.operators.Pop());
                     }
                 }
             }
@@ -251,7 +251,7 @@ namespace SciCalc
                 {
                     while (this.operators.Count > 0)
                     {
-                        this.rpn.Push(this.operators.Pop());
+                        this.PostfixNotation.Push(this.operators.Pop());
                     }
                 }
             }
@@ -263,7 +263,7 @@ namespace SciCalc
         public double Solve()
         {
             var results = new Stack<double>();
-            IEnumerable<Token> input = this.rpn.Reverse();
+            IEnumerable<Token> input = this.PostfixNotation.Reverse();
 
             foreach (Token token in input)
             {

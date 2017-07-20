@@ -1,18 +1,14 @@
-﻿namespace SciCalc.Tokens
+﻿using System.Globalization;
+
+namespace SciCalc.Tokens
 {
     public class Value : Token
     {
-        public Value()
+        public Value(double value) : base(value.ToString(CultureInfo.InvariantCulture))
         {
             this.Priority = 0;
             this.ArgumentCount = 0;
-            this.Symbol = "";
             this.Type = TokenType.Value;
-            this.Value = 0.0;
-        }
-
-        public Value(double value) : this()
-        {
             this.Value = value;
         }
     }

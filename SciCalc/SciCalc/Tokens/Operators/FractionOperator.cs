@@ -1,12 +1,11 @@
-﻿namespace SciCalc.Tokens.Operators
+namespace SciCalc.Tokens.Operators
 {
     public class FractionOperator : Operator
     {
-        public FractionOperator()
+        public FractionOperator() : base("_")
         {
             this.ArgumentCount = 2;
             this.Priority = 3;
-            this.Symbol = "_";
         }
 
         public override double Execute(double arg1, double arg2)

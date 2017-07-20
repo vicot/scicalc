@@ -2,11 +2,10 @@
 {
     public class DivOperator : Operator
     {
-        public DivOperator()
+        public DivOperator() : base(" / ")
         {
             this.ArgumentCount = 2;
             this.Priority = 2;
-            this.Symbol = " / ";
         }
 
         public override double Execute(double arg1, double arg2)

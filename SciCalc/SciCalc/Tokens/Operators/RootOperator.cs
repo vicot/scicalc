@@ -4,11 +4,10 @@ namespace SciCalc.Tokens.Operators
 {
     public class RootOperator : Operator
     {
-        public RootOperator(bool unary)
+        public RootOperator(bool unary) : base("√")
         {
             this.ArgumentCount = unary ? 1 : 2;
             this.Priority = 3;
-            this.Symbol = "√";
         }
 
         public override double Execute(double arg1, double arg2)

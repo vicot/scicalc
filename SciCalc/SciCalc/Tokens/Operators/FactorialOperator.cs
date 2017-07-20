@@ -2,11 +2,10 @@
 {
     public class FactorialOperator : Operator
     {
-        public FactorialOperator()
+        public FactorialOperator() : base("! ")
         {
             this.ArgumentCount = 1;
             this.Priority = 4;
-            this.Symbol = "! ";
         }
 
         public override double Execute(double arg)

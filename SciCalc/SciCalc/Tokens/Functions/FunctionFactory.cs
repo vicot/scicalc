@@ -21,7 +21,8 @@ namespace SciCalc.Tokens.Functions
                 case "log":
                     return new LogFunction();
                 default:
-                    throw new ArgumentException($"'{name}' is not a valid function.");
+                    return new Function(name);
+                    //throw new ArgumentException($"'{name}' is not a valid function.");
             }
         }
     }

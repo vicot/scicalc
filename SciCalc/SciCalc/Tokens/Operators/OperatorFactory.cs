@@ -4,9 +4,9 @@ namespace SciCalc.Tokens.Operators
 {
     public static class OperatorFactory
     {
-        public static Token GetToken(char name, bool alternative = false)
+        public static Token GetToken(char symbol, bool alternative = false)
         {
-            switch (name)
+            switch (symbol)
             {
                 case '+':
                     return new SumOperator();
@@ -31,7 +31,8 @@ namespace SciCalc.Tokens.Operators
                 case '_':
                     return new FractionOperator();
                 default:
-                    throw new ArgumentException($"'{name}' is not a valid operator.");
+                    return new Operator($" {symbol} ");
+                //throw new ArgumentException($"'{symbol}' is not a valid operator.");
             }
         }
     }

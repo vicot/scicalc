@@ -4,9 +4,8 @@ namespace SciCalc.Tokens.Functions
 {
     public class LnFunction : Function
     {
-        public LnFunction()
+        public LnFunction() : base("ln")
         {
-            this.Symbol = " ln";
             this.ArgumentCount = 1;
         }
 
