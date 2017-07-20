@@ -28,6 +28,8 @@ namespace SciCalc.Tokens.Operators
                     return new FactorialOperator();
                 case '(':
                     return new ParentOperator();
+                case '_':
+                    return new FractionOperator();
                 default:
                     throw new ArgumentException($"'{name}' is not a valid operator.");
             }

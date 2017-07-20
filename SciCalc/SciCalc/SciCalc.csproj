@@ -62,6 +62,7 @@
     <Compile Include="Tokens\Functions\LogFunction.cs" />
     <Compile Include="Tokens\Functions\SinFunction.cs" />
     <Compile Include="Tokens\Functions\TanFunction.cs" />
+    <Compile Include="Tokens\Operators\FractionOperator.cs" />
     <Compile Include="Tokens\Operators\Operator.cs" />
     <Compile Include="Tokens\Operators\OperatorFactory.cs" />
     <Compile Include="Tokens\Operators\PercentOperator.cs" />

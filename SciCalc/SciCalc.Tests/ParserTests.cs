@@ -179,12 +179,16 @@ namespace SciCalc.Tests
         [Test]
         public void OperatorFraction()
         {
-            //todo ???
             var parser = new Parser();
-            Assert.Fail("test not implemented");
-            //parser.Parse("5⁄3");
-            //double expected = 4;
-            //Assert.That(result, Is.EqualTo(expected));
+            parser.Parse("5_2");
+            var result = parser.Solve();
+            double expected = 2.5;
+            Assert.That(result, Is.EqualTo(expected));
+
+            parser.Parse("1_2/3_4");
+            result = parser.Solve();
+            expected = 2.0/3.0;
+            Assert.That(result, Is.EqualTo(expected));
         }
 
         [Test]
