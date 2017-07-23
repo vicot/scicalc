@@ -9,45 +9,50 @@ namespace SciCalc
 {
     public class Parser
     {
-        private readonly Stack<Token> operators;
-
-        public Stack<Token> PostfixNotation { get; }
-        private Token lastToken;
-
         public Parser()
         {
-            this.Variables = new Dictionary<string, double>
+            this.Constants = new Dictionary<string, double>
             {
                 {"PI", Math.PI},
                 {"E", Math.E}
             };
             this.PostfixNotation = new Stack<Token>();
-            this.operators = new Stack<Token>();
+            new Stack<Token>();
         }
 
-        public Dictionary<string, double> Variables { get; }
+        public Stack<Token> PostfixNotation { get; }
+
+        public Dictionary<string, double> Constants { get; }
 
 
         public void SetVariable(string name, double value)
         {
-            this.Variables[name] = value;
+            this.Constants[name] = value;
+        }
+
+        public void LoadToPostfix(string expression)
+        {
+            var tokens = this.ParseTokens(expression);
+            this.LoadToPostfix(tokens);
         }
 
         public bool UnsetVariable(string name)
         {
-            return this.Variables.Remove(name);
+            return this.Constants.Remove(name);
         }
 
-        public void Parse(string expression)
+        public List<Token> ParseTokens(string expression)
         {
-            this.operators.Clear();
-            this.PostfixNotation.Clear();
-            this.lastToken = null;
-
             var state = ParseState.None;
             var startPosition = 0;
+            var parentLevel = 0;
             var endWord = false;
+            Token lastToken = null;
 
+
+            expression = expression.Replace(" ", "");
+
+            var tokenList = new List<Token>(expression.Length);
 
             for (var pos = 0; pos < expression.Length; ++pos)
             {
@@ -70,7 +75,7 @@ namespace SciCalc
                             break;
                     }
                 }
-                else if (c == '.') //fraction
+                else if (c == '.') //real
                 {
                     switch (state)
                     {
@@ -83,23 +88,28 @@ namespace SciCalc
                             break;
 
                         case ParseState.ValueDouble:
-                            throw new ParseException($"Unexpected '.' at position {pos + 1}");
+                            lastToken = this.ParseLongToken(expression, state, startPosition, pos);
+                            tokenList.Add(lastToken);
+                            tokenList.Add(new ExcessiveDotToken());
+                            state = ParseState.None;
+                            --pos; //scan the character again
+                            continue;
 
                         default:
                             endWord = true;
                             break;
                     }
                 }
-                else if (c >= 'A' && c <= 'Z') //variables
+                else if (c >= 'A' && c <= 'Z') //constants
                 {
                     switch (state)
                     {
                         case ParseState.None:
                             startPosition = pos;
-                            state = ParseState.Variable;
+                            state = ParseState.Constant;
                             break;
 
-                        case ParseState.Variable:
+                        case ParseState.Constant:
                             break; // continue reading name
 
                         default:
@@ -124,47 +134,38 @@ namespace SciCalc
                             break;
                     }
                 }
-                else if (c == ')')
+                else //operators
                 {
                     if (state == ParseState.None)
                     {
-                        while (true)
+                        var newToken = OperatorFactory.GetToken(c, lastToken == null || lastToken is Operator);
+                        if (newToken is ParentOperator) parentLevel++;
+                        else if (newToken is CloseParentOperator)
                         {
-                            if (this.operators.Count == 0)
-                            {
-                                throw new ParseException("Unexpected ')'. Does not match with any '('");
-                            }
-
-                            Token token = this.operators.Pop();
-                            if (token is ParentOperator)
-                            {
-                                break;
-                            }
-
-                            this.PostfixNotation.Push(token);
+                            parentLevel--;
+                            if (parentLevel < 0) newToken.IsValid = false;
                         }
+                        else
+                        {
+                            //ignore parent operators for lastToken
+                            lastToken = newToken;
+                        }
+
+                        tokenList.Add(newToken);
                     }
                     else
                     {
                         endWord = true;
                     }
+
                 }
-                else //operator
-                {
-                    if (state == ParseState.None)
-                    {
-                        this.PushNewOperator(c);
-                    }
-                    else
-                    {
-                        endWord = true;
-                    }
-                }
+
 
                 if (endWord)
                 {
                     endWord = false;
-                    this.PushLongToken(expression, state, startPosition, pos);
+                    lastToken = this.ParseLongToken(expression, state, startPosition, pos);
+                    tokenList.Add(lastToken);
 
                     state = ParseState.None;
                     --pos; //scan the character again
@@ -172,92 +173,112 @@ namespace SciCalc
             }
 
             //finish parsing last token
-            this.PushLongToken(expression, state, startPosition, expression.Length);
-
-            //copy remaining operators to RPN stack
-            while (this.operators.Count > 0)
+            if (state != ParseState.None)
             {
-                this.PostfixNotation.Push(this.operators.Pop());
+                tokenList.Add(this.ParseLongToken(expression, state, startPosition, expression.Length));
             }
+
+            while (parentLevel-- > 0)
+            {
+                //autoclose remaining parents
+                tokenList.Add(new CloseParentOperator{Inferred = true});
+            }
+
+            return tokenList;
         }
 
-        private void PushLongToken(string expression, ParseState state, int startPosition, int endPosition)
+        private Token ParseLongToken(string expression, ParseState state, int startPosition, int endPosition)
         {
             string tokenstring = expression.Substring(startPosition, endPosition - startPosition);
             switch (state)
             {
                 case ParseState.ValueInteger:
                 case ParseState.ValueDouble:
-                    this.lastToken = new Value(double.Parse(tokenstring));
-                    this.PostfixNotation.Push(this.lastToken);
-                    break;
+                    return new Value(double.Parse(tokenstring));
 
-                case ParseState.Variable:
-                    if (this.Variables.ContainsKey(tokenstring))
-                    {
-                        this.lastToken = new Value(this.Variables[tokenstring]);
-                        this.PostfixNotation.Push(this.lastToken);
-                    }
-                    else
-                    {
-                        throw new ParseException($"Variable '{tokenstring}' is undefined.");
-                    }
-
-                    break;
+                case ParseState.Constant:
+                    return this.Constants.ContainsKey(tokenstring)
+                        ? new Constant(tokenstring, this.Constants[tokenstring])
+                        : new Constant(tokenstring);
 
                 case ParseState.Function:
-                {
-                    if (tokenstring == "m")
-                    {
-                        this.PushNewOperator(tokenstring[0]);
-                    }
-                    else
-                    {
-                        this.PushNewFunction(tokenstring);
-                    }
-
-                    break;
-                }
+                    return FunctionFactory.GetToken(tokenstring);
             }
+
+            return null;
         }
 
-        private void PushNewFunction(string name)
+        public void LoadToPostfix(List<Token> tokens)
         {
-            Token op = FunctionFactory.GetToken(name);
-            if (this.operators.Count > 0)
+            this.PostfixNotation.Clear();
+            var operators = new Stack<Token>();
+
+            foreach (var token in tokens)
             {
-                Token top = this.operators.Peek();
-                if (top.Priority > op.Priority)
+                if (!token.IsValid)
                 {
-                    while (this.operators.Count > 0)
-                    {
-                        this.PostfixNotation.Push(this.operators.Pop());
-                    }
+                    throw new ParseException(token.ErrorMessage);
+                }
+
+                switch (token.Type)
+                {
+                    case TokenType.Value:
+                    case TokenType.Constant:
+                        this.PostfixNotation.Push(token);
+                        break;
+
+                    case TokenType.Function:
+                        if (operators.Count > 0)
+                        {
+                            Token top1 = operators.Peek();
+                            if (top1.Priority > token.Priority)
+                            {
+                                while (operators.Count > 0)
+                                {
+                                    this.PostfixNotation.Push(operators.Pop());
+                                }
+                            }
+                        }
+
+                        operators.Push(token);
+                        break;
+
+                    case TokenType.Operator:
+                        if (token is CloseParentOperator)
+                        {
+                            while (true)
+                            {
+                                Token t = operators.Pop();
+                                if (t is ParentOperator) break;
+
+                                this.PostfixNotation.Push(t);
+                            }
+
+                            //skip pushing of ) operator
+                            continue;
+                        }
+                        else if (token.Priority > 0 && operators.Count > 0)
+                        {
+                            Token top = operators.Peek();
+                            if (top.Priority > token.Priority)
+                            {
+                                while (operators.Count > 0)
+                                {
+                                    this.PostfixNotation.Push(operators.Pop());
+                                }
+                            }
+                        }
+
+                        operators.Push(token);
+                        break;
                 }
             }
 
-            this.operators.Push(op);
-            this.lastToken = op;
-        }
-
-        private void PushNewOperator(char c)
-        {
-            Token op = OperatorFactory.GetToken(c, this.lastToken == null || this.lastToken is Operator);
-
-            if (op.Priority > 0 && this.operators.Count > 0)
+            //copy remaining operators to RPN stack
+            while (operators.Count > 0)
             {
-                Token top = this.operators.Peek();
-                if (top.Priority > op.Priority)
-                {
-                    while (this.operators.Count > 0)
-                    {
-                        this.PostfixNotation.Push(this.operators.Pop());
-                    }
-                }
+                this.PostfixNotation.Push(operators.Pop());
             }
-
-            this.operators.Push(op);
-            this.lastToken = op;
         }
 
         public double Solve()
@@ -267,7 +288,7 @@ namespace SciCalc
 
             foreach (Token token in input)
             {
-                if (token is Value)
+                if (token is Value || token is Constant)
                 {
                     results.Push(token.Value);
                 }
@@ -278,7 +299,7 @@ namespace SciCalc
                         double arg = results.Pop();
                         results.Push(token.Execute(arg));
                     }
-                    else
+                    else if(token.ArgumentCount == 2)
                     {
                         double arg2 = results.Pop();
                         double arg1 = results.Pop();
@@ -300,7 +321,7 @@ namespace SciCalc
             None,
             ValueInteger,
             ValueDouble,
-            Variable,
+            Constant,
             Function
         }
     }

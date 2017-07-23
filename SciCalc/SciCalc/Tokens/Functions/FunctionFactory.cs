@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SciCalc.Tokens.Functions
+﻿namespace SciCalc.Tokens.Functions
 {
     public static class FunctionFactory
     {
@@ -21,8 +19,8 @@ namespace SciCalc.Tokens.Functions
                 case "log":
                     return new LogFunction();
                 default:
-                    return new Function(name);
-                    //throw new ArgumentException($"'{name}' is not a valid function.");
+                    return new Function(name, false);
+                //throw new ArgumentException($"'{name}' is not a valid function.");
             }
         }
     }

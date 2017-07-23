@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SciCalc.Tokens.Operators
+﻿namespace SciCalc.Tokens.Operators
 {
     public static class OperatorFactory
     {
@@ -16,7 +14,7 @@ namespace SciCalc.Tokens.Operators
                     return new DivOperator();
                 case '*':
                     return new MulOperator();
-                case 'm':
+                case '#':
                     return new ModOperator();
                 case '^':
                     return new PowerOperator();
@@ -28,11 +26,12 @@ namespace SciCalc.Tokens.Operators
                     return new FactorialOperator();
                 case '(':
                     return new ParentOperator();
+                case ')':
+                    return new CloseParentOperator();
                 case '_':
                     return new FractionOperator();
                 default:
-                    return new Operator($" {symbol} ");
-                //throw new ArgumentException($"'{symbol}' is not a valid operator.");
+                    return new Operator($" {symbol} ", false);
             }
         }
     }

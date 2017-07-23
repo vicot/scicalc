@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 
 namespace SciCalc
@@ -16,6 +17,8 @@ namespace SciCalc
         private readonly StringBuilder currentToken;
         private readonly Parser parser;
 
+        private Paragraph paragraph;
+
         public MainWindow()
         {
             this.InitializeComponent();
@@ -26,17 +29,30 @@ namespace SciCalc
 
         private void SolveButton_Click(object sender, RoutedEventArgs e)
         {
-            var expression = this.EquationBox.Text.Replace(" ", "");
-
-            
-            this.parser.Parse(expression);
-            this.ResultBox.Text = this.parser.Solve().ToString(CultureInfo.InvariantCulture);
+            this.parser.LoadToPostfix(this.EquationBox.Text);
+            this.ResultParagraph.Inlines.Clear();
+            this.ResultParagraph.Inlines.Add(new Run(this.parser.Solve().ToString(CultureInfo.InvariantCulture)));
+            this.ResultParagraph.Inlines.Add(new Run(this.parser.Solve().ToString(CultureInfo.InvariantCulture)));
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-  
+            Console.WriteLine($"[KeyDown]: {Keyboard.Modifiers} - {e.Key}");
 
+            //handle C-v and C-c keys for paste/copy
+            if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
+            {
+                switch (e.Key)
+                {
+                    case Key.V:
+                        this.ProcessKeyInput(Clipboard.GetText(TextDataFormat.Text));
+                        return;
+
+                    case Key.C:
+                        Clipboard.SetText("Hello world", TextDataFormat.Text);
+                        return;
+                }
+            }
         }
 
         private void ProcessKeyInput(string keys)
@@ -50,7 +66,7 @@ namespace SciCalc
         private void ProcessKeyInput(char key)
         {
             this.currentToken.Append(key);
-            this.parser.Parse(this.currentToken.ToString());
+            this.parser.LoadToPostfix(this.currentToken.ToString());
             string token = this.parser.PostfixNotation.OrderBy(t => t.Index).First().Symbol;
             if (this.parser.PostfixNotation.Count > 1)
             {
@@ -65,7 +81,7 @@ namespace SciCalc
 
         private void Window_TextInput(object sender, TextCompositionEventArgs e)
         {
-            Console.WriteLine($"[KeyDown]: {Keyboard.Modifiers} - {e.Text}");
+            Console.WriteLine($"[TextInput]: {Keyboard.Modifiers} - {e.Text}");
 
             bool shiftPressed = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
 
@@ -87,7 +103,7 @@ namespace SciCalc
             //normal keys
             if (e.Text.Length == 1)
             {
-                char key = e.Text.ToString()[0];
+                char key = e.Text[0];
 
                 //special case for upper and lowercase letters
                 if (char.IsLetter(key))
@@ -102,9 +118,7 @@ namespace SciCalc
 
                 //if not letter, process as-is
                 this.ProcessKeyInput(key);
-                return;
             }
-
         }
     }
 }

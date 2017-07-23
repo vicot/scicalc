@@ -57,6 +57,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="TokenRun.cs" />
+    <Compile Include="Tokens\EmptyToken.cs" />
     <Compile Include="Tokens\Functions\CosFunction.cs" />
     <Compile Include="Tokens\Functions\CtgFunction.cs" />
     <Compile Include="Tokens\Functions\Function.cs" />
@@ -66,8 +68,10 @@
     <Compile Include="Tokens\Functions\SinFunction.cs" />
     <Compile Include="Tokens\Functions\TanFunction.cs" />
     <Compile Include="Tokens\Operators\FractionOperator.cs" />
+    <Compile Include="Tokens\Operators\ExcessiveDotToken.cs" />
     <Compile Include="Tokens\Operators\Operator.cs" />
     <Compile Include="Tokens\Operators\OperatorFactory.cs" />
+    <Compile Include="Tokens\Operators\CloseParentOperator.cs" />
     <Compile Include="Tokens\Operators\PercentOperator.cs" />
     <Compile Include="Tokens\Operators\RootOperator.cs" />
     <Compile Include="Tokens\Operators\ModOperator.cs" />
@@ -80,7 +84,9 @@
     <Compile Include="Tokens\Operators\SubOperator.cs" />
     <Compile Include="Tokens\Operators\SumOperator.cs" />
     <Compile Include="ParseException.cs" />
-    <Compile Include="Token.cs" />
+    <Compile Include="Tokens\Token.cs" />
+    <Compile Include="Tokens\Constant.cs" />
+    <Compile Include="Tokens\TokenType.cs" />
     <Compile Include="Tokens\Value.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

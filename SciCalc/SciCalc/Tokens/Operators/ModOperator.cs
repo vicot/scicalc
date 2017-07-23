@@ -2,7 +2,7 @@
 {
     public class ModOperator : Operator
     {
-        public ModOperator() : base(" m ")
+        public ModOperator() : base(" # ")
         {
             this.ArgumentCount = 2;
             this.Priority = 2;

@@ -4,7 +4,7 @@
     {
         public ParentOperator() : base(" (")
         {
-            this.ArgumentCount = 2;
+            this.ArgumentCount = 0;
             this.Priority = 0;
         }
     }
