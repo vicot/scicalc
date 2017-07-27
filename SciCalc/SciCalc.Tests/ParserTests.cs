@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using SciCalc.Tokens;
 using SciCalc.Tokens.Operators;
+using SciCalc.Tokens.Values;
 
 namespace SciCalc.Tests
 {
@@ -16,21 +17,35 @@ namespace SciCalc.Tests
 
             var expected = new List<Token>
             {
-                new Value(15),
+                new IntegerValue(15),
                 new SumOperator(),
-                new Value(3),
+                new IntegerValue(3),
                 new SubOperator(),
-                new Value(6),
+                new IntegerValue(6),
                 new MulOperator(),
-                new Value(10.3),
+                new DoubleValue(10.3),
                 new ExcessiveDotToken(),
-                new Value(5)
+                new IntegerValue(5)
             };
 
             var p = new Parser();
             var result = p.ParseTokens(expression);
 
             Assert.That(result, Is.EquivalentTo(expected));
+        }
+
+        [Test]
+        public void InsertMultiplyOperators()
+        {
+
+            var p = new Parser();
+            p.LoadToPostfix("15(3-1)");
+            var result = p.Solve();
+            var expected = 30;
+
+            Assert.AreEqual(result, expected, "Should add * between number and (");
+
+            
         }
 
     }

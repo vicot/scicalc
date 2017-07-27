@@ -96,6 +96,11 @@ namespace SciCalc.Tests
             result = parser.Solve();
             expected = Math.Sin(Math.PI / 2);
             Assert.That(result, Is.EqualTo(expected));
+
+            parser.LoadToPostfix("sin(1_2 * PI)");
+            result = parser.Solve();
+            expected = Math.Sin(Math.PI / 2);
+            Assert.That(result, Is.EqualTo(expected));
         }
 
         [Test]
@@ -270,37 +275,43 @@ namespace SciCalc.Tests
             parser.LoadToPostfix("2+2*2");
             double result = parser.Solve();
             double expected = 6;
-            Assert.That(expected, Is.EqualTo(result), "sum before mul");
+            Assert.That(result, Is.EqualTo(expected), "sum before mul");
 
             parser.LoadToPostfix("2*(2+2)");
             result = parser.Solve();
             expected = 8;
-            Assert.That(expected, Is.EqualTo(result), "parenthesis ignored");
+            Assert.That(result, Is.EqualTo(expected), "parenthesis ignored");
 
             parser.LoadToPostfix("2*3^2");
             result = parser.Solve();
             expected = 18;
-            Assert.That(expected, Is.EqualTo(result), "mul before power");
+            Assert.That(result, Is.EqualTo(expected), "mul before power");
 
             parser.LoadToPostfix("3+2+50%+5");
             result = parser.Solve();
             expected = 10.5;
-            Assert.That(expected, Is.EqualTo(result), "percent should only affect the 50");
+            Assert.That(result, Is.EqualTo(expected), "percent should only affect the 50");
 
             parser.LoadToPostfix("√4+5");
             result = parser.Solve();
             expected = 7;
-            Assert.That(expected, Is.EqualTo(result), "sum before root");
+            Assert.That(result, Is.EqualTo(expected), "sum before root");
 
             parser.LoadToPostfix("(5-3)√4+5");
             result = parser.Solve();
             expected = 7;
-            Assert.That(expected, Is.EqualTo(result), "should solve 5-3 first to create square root");
+            Assert.That(result, Is.EqualTo(expected), "should solve 5-3 first to create square root");
 
             parser.LoadToPostfix("3+7*log3(7+2)-8");
             result = parser.Solve();
             expected = 9;
-            Assert.That(expected, Is.EqualTo(result), "");
+            Assert.That(result, Is.EqualTo(expected), "");
+
+            parser.LoadToPostfix("sin(1-1+1_2*PI)");
+            result = parser.Solve();
+            expected = 1;
+            Assert.That(result, Is.EqualTo(expected), "fraction > mul > sum and sub");
+
         }
 
         [Test]
@@ -335,6 +346,11 @@ namespace SciCalc.Tests
             parser.LoadToPostfix("7.34-2.12");
             result = parser.Solve();
             expected = 5.22;
+            Assert.That(result, Is.EqualTo(expected));
+
+            parser.LoadToPostfix("1-1+2");
+            result = parser.Solve();
+            expected = 2;
             Assert.That(result, Is.EqualTo(expected));
         }
 

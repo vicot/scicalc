@@ -1,10 +1,10 @@
 ﻿using System.Globalization;
 
-namespace SciCalc.Tokens
+namespace SciCalc.Tokens.Values
 {
-    public class Value : Token
+    public abstract class Value : Token
     {
-        public Value(double value) : base(value.ToString(CultureInfo.InvariantCulture))
+        protected Value(double value) : base(value.ToString(CultureInfo.InvariantCulture))
         {
             this.Priority = 0;
             this.ArgumentCount = 0;

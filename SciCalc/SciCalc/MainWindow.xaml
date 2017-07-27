@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SciCalc"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" Background="DarkGray" KeyDown="Window_KeyDown"
-        TextInput="Window_TextInput">
+        Title="MainWindow" Height="350" Width="525" Background="DarkGray" PreviewKeyDown="Window_KeyDown" 
+        PreviewTextInput="Window_TextInput" Loaded="Window_Loaded">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="5" />
@@ -32,16 +32,22 @@
                     <RowDefinition Height="3*" />
                 </Grid.RowDefinitions>
 
-                <TextBox Name="EquationBox" Grid.Row="0" Background="Transparent" BorderThickness="0"
-                         Text="lnE" FontSize="10" IsReadOnly="True" IsReadOnlyCaretVisible="False" Focusable="False"
-                         Cursor="Arrow" />
+                <RichTextBox x:Name="ExpressionRichBox" Grid.Row="0" Background="Transparent" BorderThickness="0" 
+                         FontSize="10"  IsReadOnlyCaretVisible="True" AcceptsReturn="False" AcceptsTab="False" IsReadOnly="True"
+                         Cursor="Arrow" SelectionChanged="RichTextBox_SelectionChanged" IsUndoEnabled="False" >
+                    <FlowDocument>
+                        <Section>
+                            <Paragraph x:Name="ExpressionParagraph" TextAlignment="Left" FontFamily="Consolas" FontSize="16" Margin="0">
+                            </Paragraph>
+                        </Section>
+                    </FlowDocument>
+                </RichTextBox>
                 <RichTextBox Grid.Row="1" Background="Transparent" BorderThickness="0"
                              FontSize="20" HorizontalContentAlignment="Right"
-                             VerticalContentAlignment="Bottom" IsReadOnly="True" IsReadOnlyCaretVisible="True"
+                             VerticalContentAlignment="Bottom"  IsReadOnlyCaretVisible="True"
                              Cursor="Arrow">
                     <FlowDocument>
-                        <Paragraph x:Name="ResultParagraph" TextAlignment="Right">
-                        </Paragraph>
+                        <Paragraph x:Name="ResultParagraph" TextAlignment="Right" />
                     </FlowDocument>
 
                 </RichTextBox>
@@ -89,9 +95,9 @@
             <Button Grid.Row="1" Grid.Column="3" Margin="1" Content="6" />
             <Button Grid.Row="1" Grid.Column="4" Margin="1" Content="*" />
 
-            <Button Grid.Row="2" Grid.Column="1" Margin="1" Content="1" />
-            <Button Grid.Row="2" Grid.Column="2" Margin="1" Content="2" />
-            <Button Grid.Row="2" Grid.Column="3" Margin="1" Content="3" />
+            <Button Grid.Row="2" Grid.Column="1" Margin="1" Content="1" Click="Button_1_Click" />
+            <Button Grid.Row="2" Grid.Column="2" Margin="1" Content="2" Click="Button_2_Click" />
+            <Button Grid.Row="2" Grid.Column="3" Margin="1" Content="3" Click="Button_3_Click" />
             <Button Grid.Row="2" Grid.Column="4" Margin="1" Content="-" />
 
             <Button Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Content="0" />

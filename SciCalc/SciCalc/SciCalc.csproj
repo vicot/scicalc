@@ -57,6 +57,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Extensions.cs" />
     <Compile Include="TokenRun.cs" />
     <Compile Include="Tokens\EmptyToken.cs" />
     <Compile Include="Tokens\Functions\CosFunction.cs" />
@@ -85,9 +86,11 @@
     <Compile Include="Tokens\Operators\SumOperator.cs" />
     <Compile Include="ParseException.cs" />
     <Compile Include="Tokens\Token.cs" />
-    <Compile Include="Tokens\Constant.cs" />
+    <Compile Include="Tokens\Values\Constant.cs" />
     <Compile Include="Tokens\TokenType.cs" />
-    <Compile Include="Tokens\Value.cs" />
+    <Compile Include="Tokens\Values\DoubleValue.cs" />
+    <Compile Include="Tokens\Values\IntegerValue.cs" />
+    <Compile Include="Tokens\Values\Value.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

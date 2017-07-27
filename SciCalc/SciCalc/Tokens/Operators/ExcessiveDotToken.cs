@@ -2,7 +2,7 @@
 {
     public class ExcessiveDotToken : Token
     {
-        public ExcessiveDotToken() : base(".")
+        public ExcessiveDotToken() : base(" . ")
         {
             //not an actual operator, only used to display excessive dots in expression view
             this.ArgumentCount = 0;

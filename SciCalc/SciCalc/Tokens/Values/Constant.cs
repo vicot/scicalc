@@ -1,4 +1,4 @@
-﻿namespace SciCalc.Tokens
+﻿namespace SciCalc.Tokens.Values
 {
     public class Constant : Token
     {

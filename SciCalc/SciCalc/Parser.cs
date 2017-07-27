@@ -4,6 +4,7 @@ using System.Linq;
 using SciCalc.Tokens;
 using SciCalc.Tokens.Functions;
 using SciCalc.Tokens.Operators;
+using SciCalc.Tokens.Values;
 
 namespace SciCalc
 {
@@ -80,7 +81,7 @@ namespace SciCalc
                     switch (state)
                     {
                         case ParseState.None:
-                            startPosition = pos;
+                            tokenList.Add(new ExcessiveDotToken());
                             break;
 
                         case ParseState.ValueInteger:
@@ -92,7 +93,6 @@ namespace SciCalc
                             tokenList.Add(lastToken);
                             tokenList.Add(new ExcessiveDotToken());
                             state = ParseState.None;
-                            --pos; //scan the character again
                             continue;
 
                         default:
@@ -139,7 +139,10 @@ namespace SciCalc
                     if (state == ParseState.None)
                     {
                         var newToken = OperatorFactory.GetToken(c, lastToken == null || lastToken is Operator);
-                        if (newToken is ParentOperator) parentLevel++;
+                        if (newToken is ParentOperator)
+                        {
+                            parentLevel++;
+                        }
                         else if (newToken is CloseParentOperator)
                         {
                             parentLevel--;
@@ -151,6 +154,8 @@ namespace SciCalc
                             lastToken = newToken;
                         }
 
+                        //don't add excessive parents
+                        //if(newToken != null)
                         tokenList.Add(newToken);
                     }
                     else
@@ -178,11 +183,11 @@ namespace SciCalc
                 tokenList.Add(this.ParseLongToken(expression, state, startPosition, expression.Length));
             }
 
-            while (parentLevel-- > 0)
-            {
-                //autoclose remaining parents
-                tokenList.Add(new CloseParentOperator{Inferred = true});
-            }
+//            while (parentLevel-- > 0)
+//            {
+//                //autoclose remaining parents
+//                tokenList.Add(new CloseParentOperator{Inferred = true});
+//            }
 
             return tokenList;
         }
@@ -193,8 +198,10 @@ namespace SciCalc
             switch (state)
             {
                 case ParseState.ValueInteger:
+                    return new IntegerValue(long.Parse(tokenstring));
+
                 case ParseState.ValueDouble:
-                    return new Value(double.Parse(tokenstring));
+                    return new DoubleValue(double.Parse(tokenstring));
 
                 case ParseState.Constant:
                     return this.Constants.ContainsKey(tokenstring)
@@ -206,6 +213,11 @@ namespace SciCalc
             }
 
             return null;
+        }
+
+        private void VerifyTokens(List<Token> tokens)
+        {
+            
         }
 
         public void LoadToPostfix(List<Token> tokens)
@@ -260,10 +272,13 @@ namespace SciCalc
                         else if (token.Priority > 0 && operators.Count > 0)
                         {
                             Token top = operators.Peek();
-                            if (top.Priority > token.Priority)
+                            if (top.Priority >= token.Priority)
                             {
                                 while (operators.Count > 0)
                                 {
+                                    Token t = operators.Peek();
+                                    if (t is ParentOperator) break; // dump only from inside parent
+                                    if (t.Priority < token.Priority) break; // dump only operators with higher priority
                                     this.PostfixNotation.Push(operators.Pop());
                                 }
                             }

@@ -9,6 +9,10 @@ namespace SciCalc
     {
         private readonly Token token;
 
+        public TokenRun()
+        {
+        }
+
         public TokenRun(string text) : base(text)
         {
             this.token = new EmptyToken();
@@ -44,12 +48,16 @@ namespace SciCalc
                         break;
                 }
 
-                if (token.Inferred)
-                {
-                    this.Foreground = Brushes.Gray;
-                }
+                //if (token.Inferred)
+                //{
+                //    this.Foreground = Brushes.Gray;
+                //}
             }
 
+        }
+
+        public TokenRun(string text, TextPointer insertionPosition) : base(text, insertionPosition)
+        {
         }
 
         public List<TokenRun> ConnectToken(Token nextToken)
