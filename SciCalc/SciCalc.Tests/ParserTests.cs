@@ -13,7 +13,7 @@ namespace SciCalc.Tests
         [Test]
         public void TokenizeExpression()
         {
-            var expression = "15 + 3 - 6 * 10.3.5";
+            var expression = "15 + 3 - 6 * 10.3.5 + (1) - -3";
 
             var expected = new List<Token>
             {
@@ -25,7 +25,14 @@ namespace SciCalc.Tests
                 new MulOperator(),
                 new DoubleValue(10.3),
                 new ExcessiveDotToken(),
-                new IntegerValue(5)
+                new IntegerValue(5),
+                new SumOperator(),
+                new ParentOperator(),
+                new IntegerValue(1),
+                new CloseParentOperator(),
+                new SubOperator(),
+                new NegateOperator(),
+                new IntegerValue(3)
             };
 
             var p = new Parser();
@@ -37,16 +44,30 @@ namespace SciCalc.Tests
         [Test]
         public void InsertMultiplyOperators()
         {
+            /* add multiplication between:
+            * - values (and constants)
+            * - values and functions
+            * - values and parenthesis
+            * - closing and opening parenthesis
+            * - left-bound unary operators and opening parenthesis
+            * - closing parenthesis and values, functions
+            * 
+            * don't add multiplication for logartihm case: log2(...)
+            */
 
             var p = new Parser();
-            p.LoadToPostfix("15(3-1)");
-            var result = p.Solve();
-            var expected = 30;
+            p.SetVariable("X", 2);
 
-            Assert.AreEqual(result, expected, "Should add * between number and (");
+            p.LoadToPostfix("3!(3X)(100%(4))log2(2(2))");
+            var result = p.Solve();
+            var expected = 288;
+
+            Assert.AreEqual(result, expected, "Should fix the expression to: 3! * (3*X)*(100% * (4))*log2(2*(2)) = 288");
 
             
         }
+
+        
 
     }
 }

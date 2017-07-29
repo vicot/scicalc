@@ -1,11 +1,35 @@
 ﻿using System;
 using NUnit.Framework;
+using SciCalc.Tokens;
+using SciCalc.Tokens.Operators;
+using SciCalc.Tokens.Values;
 
 namespace SciCalc.Tests
 {
     [TestFixture]
     public class TokenTests
     {
+        [Test]
+        public void TokenBindings()
+        {
+            var op = new SumOperator();
+            var token1 = new IntegerValue(0);
+            var token2 = new ParentOperator();
+            var token3 = new CloseParentOperator();
+            var token4 = new SubOperator();
+            
+            Assert.IsTrue(op.IsLeftBound(token1));
+            Assert.IsFalse(op.IsLeftBound(token2));
+            Assert.IsTrue(op.IsLeftBound(token3));
+            Assert.IsFalse(op.IsLeftBound(token4));
+
+            Assert.IsTrue(op.IsRightBound(token1));
+            Assert.IsTrue(op.IsRightBound(token2));
+            Assert.IsFalse(op.IsRightBound(token3));
+            Assert.IsFalse(op.IsRightBound(token4));
+        }
+
+
         [Test]
         public void Constants()
         {
@@ -196,6 +220,11 @@ namespace SciCalc.Tests
             result = parser.Solve();
             expected = 4;
             Assert.That(result, Is.EqualTo(expected));
+
+            parser.LoadToPostfix("(3+3)-3");
+            result = parser.Solve();
+            expected = 3;
+            Assert.That(result, Is.EqualTo(expected), "(3+3)-3, minus is a binary operator here");
         }
 
         [Test]
@@ -296,11 +325,6 @@ namespace SciCalc.Tests
             result = parser.Solve();
             expected = 7;
             Assert.That(result, Is.EqualTo(expected), "sum before root");
-
-            parser.LoadToPostfix("(5-3)√4+5");
-            result = parser.Solve();
-            expected = 7;
-            Assert.That(result, Is.EqualTo(expected), "should solve 5-3 first to create square root");
 
             parser.LoadToPostfix("3+7*log3(7+2)-8");
             result = parser.Solve();

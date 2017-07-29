@@ -29,14 +29,10 @@ namespace SciCalc
             }
             else
             {
-                switch (token.Type)
+                switch (token.TokenType)
                 {
                     case TokenType.Value:
                         this.Foreground = Brushes.Black;
-                        break;
-
-                    case TokenType.Constant:
-                        this.Foreground = Brushes.DarkBlue;
                         break;
 
                     case TokenType.Function:

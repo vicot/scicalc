@@ -4,7 +4,6 @@ namespace SciCalc.Tokens
     {
         Value,
         Operator,
-        Function,
-        Constant
+        Function
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SciCalc.Tokens.Operators
 {
@@ -8,6 +9,16 @@ namespace SciCalc.Tokens.Operators
         {
             this.ArgumentCount = unary ? 1 : 2;
             this.Priority = 3;
+
+            if (unary)
+            {
+                //unary version of this operator doesn't require anything on the left, and can also follow anything
+                this.leftBinding = new List<Type>
+                {
+                    null,
+                    typeof(Token)
+                };
+            }
         }
 
         public override double Execute(double arg1, double arg2)

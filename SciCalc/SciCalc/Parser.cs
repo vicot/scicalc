@@ -138,19 +138,25 @@ namespace SciCalc
                 {
                     if (state == ParseState.None)
                     {
-                        var newToken = OperatorFactory.GetToken(c, lastToken == null || lastToken is Operator);
+                        var newToken = OperatorFactory.GetToken(c, lastToken == null || (lastToken is Operator && !(lastToken is CloseParentOperator)));
                         if (newToken is ParentOperator)
                         {
                             parentLevel++;
+
+                            //clear lastToken for parenthesis so they don't break unary operators inside
+                            lastToken = null;
                         }
                         else if (newToken is CloseParentOperator)
                         {
                             parentLevel--;
                             if (parentLevel < 0) newToken.IsValid = false;
+
+                            //save closing parenthesis as last token, so the operator right after the ) doesn't think it's unary
+                            lastToken = newToken;
                         }
                         else
                         {
-                            //ignore parent operators for lastToken
+                            //save other operators as last token
                             lastToken = newToken;
                         }
 
@@ -189,6 +195,7 @@ namespace SciCalc
 //                tokenList.Add(new CloseParentOperator{Inferred = true});
 //            }
 
+            this.VerifyTokens(tokenList);
             return tokenList;
         }
 
@@ -217,13 +224,30 @@ namespace SciCalc
 
         private void VerifyTokens(List<Token> tokens)
         {
-            
+            if (tokens.Count == 0) return;
+
+            if (!tokens.First().IsLeftBound(null))
+                tokens.First().IsValid = false;
+
+            for (int i = 1; i < tokens.Count; ++i)
+            {
+                if (!tokens[i - 1].IsRightBound(tokens[i]))
+                    tokens[i - 1].IsValid = false;
+                if (!tokens[i].IsLeftBound(tokens[i-1]))
+                    tokens[i].IsValid = false;
+            }
+
+            if (!tokens.Last().IsRightBound(null))
+                tokens.Last().IsValid = false;
+
         }
 
         public void LoadToPostfix(List<Token> tokens)
         {
             this.PostfixNotation.Clear();
             var operators = new Stack<Token>();
+
+            tokens = this.InsertMissingTokens(tokens);
 
             foreach (var token in tokens)
             {
@@ -232,10 +256,9 @@ namespace SciCalc
                     throw new ParseException(token.ErrorMessage);
                 }
 
-                switch (token.Type)
+                switch (token.TokenType)
                 {
                     case TokenType.Value:
-                    case TokenType.Constant:
                         this.PostfixNotation.Push(token);
                         break;
 
@@ -294,6 +317,47 @@ namespace SciCalc
             {
                 this.PostfixNotation.Push(operators.Pop());
             }
+        }
+
+        private List<Token> InsertMissingTokens(List<Token> tokens)
+        {
+            //we will clone the original list and insert missing * operators between some tokens
+            var newTokens = new List<Token>();
+
+            for (int i = 0; i < tokens.Count-1; ++i)
+            {
+                newTokens.Add(tokens[i]);
+
+                /* add multiplication between:
+                 * - values (and constants)
+                 * - values and functions
+                 * - values and parenthesis
+                 * - closing and opening parenthesis
+                 * - left-bound unary operators and opening parenthesis
+                 * - closing parenthesis and values, functions or right-bound unary operators
+                 * 
+                 * don't add multiplication for logartihm case: log2(...)
+                 */
+                if (
+                    (tokens[i].TokenType == TokenType.Value && tokens[i + 1].TokenType == TokenType.Value) ||
+                    (tokens[i].TokenType == TokenType.Value && tokens[i + 1].TokenType == TokenType.Function) ||
+                    (tokens[i].TokenType == TokenType.Value && tokens[i + 1] is ParentOperator && (i == 0 || !(tokens[i - 1] is LogFunction))) ||
+                    (tokens[i] is PercentOperator && tokens[i + 1] is ParentOperator) ||
+                    (tokens[i] is FactorialOperator && tokens[i + 1] is ParentOperator) ||
+                    (tokens[i] is CloseParentOperator && tokens[i + 1].TokenType == TokenType.Value) ||
+                    (tokens[i] is CloseParentOperator && tokens[i + 1].TokenType == TokenType.Function) ||
+                    (tokens[i] is CloseParentOperator && tokens[i + 1] is ParentOperator))
+                {
+                    newTokens.Add(new MulOperator());
+                }
+
+
+            }
+
+            //add the last token that was ommited in the loop
+            newTokens.Add(tokens.Last());
+
+            return newTokens;
         }
 
         public double Solve()
