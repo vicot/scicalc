@@ -71,6 +71,10 @@ namespace SciCalc
                     case Key.Back:
                         this.ProcessKeyInput((char)8);
                         return;
+
+                    case Key.Delete:
+                        this.ProcessKeyInput((char)9);
+                        return;
                 }
             }
 
@@ -98,7 +102,6 @@ namespace SciCalc
             {
                 switch ((int)key)
                 {
-                    case 'd':
                     case 8: //backspace
                         {
                             if (range.IsEmpty)
@@ -133,6 +136,48 @@ namespace SciCalc
                             {
                                 range = new TextRange(range.Start.GetNextInsertionPosition(LogicalDirection.Backward),
                                                       range.End);
+                            }
+
+                            //nothing to remove, cancel operation
+                            if (range.Text.Length == 0) return;
+
+                            range.Text = "";
+                            break;
+                        }
+
+                    case 9: //delete
+                        {
+                            if (range.IsEmpty)
+                            {
+                                TextPointer nextPosition =
+                                    this.caretSelection.End.GetNextInsertionPosition(LogicalDirection.Forward);
+                                if (nextPosition != null)
+                                {
+                                    range = new TextRange(this.caretSelection.End, nextPosition);
+
+                                    //when deleting space, delete the character after it
+                                    if (range.Text == " ")
+                                    {
+                                        nextPosition =
+                                            nextPosition.GetNextInsertionPosition(LogicalDirection.Forward);
+                                        if (nextPosition != null)
+                                        {
+                                            range = new TextRange(this.caretSelection.End, nextPosition);
+
+                                        }
+                                    }
+
+                                }
+                            }
+
+                            //add space after the range if needed
+
+                            string charactersafter =
+                                range.End.GetNextInsertionPosition(LogicalDirection.Forward)?
+                                    .GetTextInRun(LogicalDirection.Backward) ?? "";
+                            if (charactersafter.Length > 0 && charactersafter.Last() == ' ')
+                            {
+                                range = new TextRange(range.Start, range.End.GetNextInsertionPosition(LogicalDirection.Forward));
                             }
 
                             //nothing to remove, cancel operation
@@ -260,10 +305,21 @@ namespace SciCalc
                 for (offset = 0; offset < expression.Length; ++offset)
                 {
                     if (offset >= this.oldExpression.Length) break;
-                    if (this.caretOffset > 0 && offset >= this.caretOffset - 1) break;
+                    if (this.caretOffset > 0 && offset >= this.caretOffset) break;
                     if (this.caretOffset > 1 && this.oldExpression[this.caretOffset - 1] == ' ' &&
-                        offset >= this.caretOffset - 2)
+                        offset >= this.caretOffset - 1)
                         break;
+
+                    if (this.oldExpression[offset] != expression[offset]) break;
+                }
+            }
+            else if (addedCharacter == 9)
+            {
+                //delete, find first difference from previous string
+                for (offset = 0; offset < expression.Length; ++offset)
+                {
+                    if (offset >= this.oldExpression.Length) break;
+                    if (this.caretOffset > 0 && offset >= this.caretOffset) break;
                     
                     if (this.oldExpression[offset] != expression[offset]) break;
                 }
@@ -333,19 +389,13 @@ namespace SciCalc
             this.ExpressionRichBox.CaretPosition = this.ExpressionParagraph.ContentStart;
         }
 
-        private void Button_1_Click(object sender, RoutedEventArgs e)
-        {
-            this.SetCursorPosition(0);
-        }
 
-        private void Button_2_Click(object sender, RoutedEventArgs e)
+        private void UiButton_Click(object sender, RoutedEventArgs e)
         {
-            this.SetCursorPosition(1);
-        }
-
-        private void Button_3_Click(object sender, RoutedEventArgs e)
-        {
-            this.SetCursorPosition(2);
+            if (sender is Button button)
+            {
+                this.ProcessKeyInput(button.DataContext as string ?? "NIEMA");
+            }
         }
     }
 }

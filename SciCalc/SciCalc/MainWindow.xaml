@@ -56,12 +56,12 @@
         </Border>
 
         <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
-            <Button Content="sin" Padding="20,0" Margin="2,0" />
-            <Button Content="cos" Padding="20,0" Margin="2,0" />
-            <Button Content="tan" Padding="20,0" Margin="2,0" />
-            <Button Content="ctg" Padding="20,0" Margin="2,0" />
-            <Button Content="ln" Padding="20,0" Margin="20,0,2,0" />
-            <Button Content="log" Padding="20,0" Margin="2,0" />
+            <Button Content="sin" Padding="20,0" Margin="2,0" Click="UiButton_Click" DataContext="sin("/>
+            <Button Content="cos" Padding="20,0" Margin="2,0" Click="UiButton_Click" DataContext="cos("/>
+            <Button Content="tan" Padding="20,0" Margin="2,0" Click="UiButton_Click" DataContext="tan("/>
+            <Button Content="ctg" Padding="20,0" Margin="2,0" Click="UiButton_Click" DataContext="ctg("/>
+            <Button Content="ln" Padding="20,0" Margin="20,0,2,0" Click="UiButton_Click" DataContext="ln("/>
+            <Button Content="log" Padding="20,0" Margin="2,0" Click="UiButton_Click" DataContext="log"/>
         </StackPanel>
 
         <Grid Grid.Row="5" Grid.Column="1">
@@ -85,38 +85,38 @@
                 <RowDefinition Height="30" />
             </Grid.RowDefinitions>
 
-            <Button Grid.Row="0" Grid.Column="1" Margin="1" Content="7" />
-            <Button Grid.Row="0" Grid.Column="2" Margin="1" Content="8" />
-            <Button Grid.Row="0" Grid.Column="3" Margin="1" Content="9" />
-            <Button Grid.Row="0" Grid.Column="4" Margin="1" Content="/" />
+            <Button Grid.Row="0" Grid.Column="1" Margin="1" Content="7" Click="UiButton_Click" DataContext="7" />
+            <Button Grid.Row="0" Grid.Column="2" Margin="1" Content="8" Click="UiButton_Click" DataContext="8" />
+            <Button Grid.Row="0" Grid.Column="3" Margin="1" Content="9" Click="UiButton_Click" DataContext="9" />
+            <Button Grid.Row="0" Grid.Column="4" Margin="1" Content="/" Click="UiButton_Click" DataContext="/" />
 
-            <Button Grid.Row="1" Grid.Column="1" Margin="1" Content="4" />
-            <Button Grid.Row="1" Grid.Column="2" Margin="1" Content="5" />
-            <Button Grid.Row="1" Grid.Column="3" Margin="1" Content="6" />
-            <Button Grid.Row="1" Grid.Column="4" Margin="1" Content="*" />
+            <Button Grid.Row="1" Grid.Column="1" Margin="1" Content="4" Click="UiButton_Click" DataContext="4" />
+            <Button Grid.Row="1" Grid.Column="2" Margin="1" Content="5" Click="UiButton_Click" DataContext="5" />
+            <Button Grid.Row="1" Grid.Column="3" Margin="1" Content="6" Click="UiButton_Click" DataContext="6" />
+            <Button Grid.Row="1" Grid.Column="4" Margin="1" Content="*" Click="UiButton_Click" DataContext="*" />
 
-            <Button Grid.Row="2" Grid.Column="1" Margin="1" Content="1" Click="Button_1_Click" />
-            <Button Grid.Row="2" Grid.Column="2" Margin="1" Content="2" Click="Button_2_Click" />
-            <Button Grid.Row="2" Grid.Column="3" Margin="1" Content="3" Click="Button_3_Click" />
-            <Button Grid.Row="2" Grid.Column="4" Margin="1" Content="-" />
+            <Button Grid.Row="2" Grid.Column="1" Margin="1" Content="1" Click="UiButton_Click" DataContext="1" />
+            <Button Grid.Row="2" Grid.Column="2" Margin="1" Content="2" Click="UiButton_Click" DataContext="2" />
+            <Button Grid.Row="2" Grid.Column="3" Margin="1" Content="3" Click="UiButton_Click" DataContext="3" />
+            <Button Grid.Row="2" Grid.Column="4" Margin="1" Content="-" Click="UiButton_Click" DataContext="-" />
 
-            <Button Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Content="0" />
+            <Button Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Content="0"  Click="UiButton_Click" DataContext="0" />
             <!--            <Button Grid.Row="3" Grid.Column="2" Margin="1" Content="7"/>-->
-            <Button Grid.Row="3" Grid.Column="3" Margin="1" Content="." />
-            <Button Grid.Row="3" Grid.Column="4" Margin="1" Content="+" />
+            <Button Grid.Row="3" Grid.Column="3" Margin="1" Content="." Click="UiButton_Click" DataContext="." />
+            <Button Grid.Row="3" Grid.Column="4" Margin="1" Content="+" Click="UiButton_Click" DataContext="+" />
 
 
-            <Button Grid.Row="0" Grid.Column="6" Margin="1" Content="!" />
-            <Button Grid.Row="0" Grid.Column="7" Margin="1" Content="m" />
+            <Button Grid.Row="0" Grid.Column="6" Margin="1" Content="!" Click="UiButton_Click" DataContext="!" />
+            <Button Grid.Row="0" Grid.Column="7" Margin="1" Content="#" Click="UiButton_Click" DataContext="#" />
 
-            <Button Grid.Row="1" Grid.Column="6" Margin="1" Content="^" />
-            <Button Grid.Row="1" Grid.Column="7" Margin="1" Content="√" />
+            <Button Grid.Row="1" Grid.Column="6" Margin="1" Content="^" Click="UiButton_Click" DataContext="^" />
+            <Button Grid.Row="1" Grid.Column="7" Margin="1" Content="√" Click="UiButton_Click" DataContext="√" />
 
-            <Button Grid.Row="2" Grid.Column="6" Margin="1" Content="%" />
-            <Button Grid.Row="2" Grid.Column="7" Margin="1" Content="-" />
+            <Button Grid.Row="2" Grid.Column="6" Margin="1" Content="%" Click="UiButton_Click" DataContext="%" />
+            <!--<Button Grid.Row="2" Grid.Column="7" Margin="1" Content="-" Click="UiButton_Click" DataContext="-" />-->
 
-            <Button Grid.Row="3" Grid.Column="6" Margin="1" Content="(" />
-            <Button Grid.Row="3" Grid.Column="7" Margin="1" Content=")" />
+            <Button Grid.Row="3" Grid.Column="6" Margin="1" Content="(" Click="UiButton_Click" DataContext="(" />
+            <Button Grid.Row="3" Grid.Column="7" Margin="1" Content=")" Click="UiButton_Click" DataContext=")" />
 
             <Button Grid.Row="3" Grid.Column="9" Margin="1" Content="=" Click="SolveButton_Click" />
         </Grid>
