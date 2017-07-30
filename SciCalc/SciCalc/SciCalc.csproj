@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{D4BEEC42-2EC1-4511-9F5A-5DB36E0F3602}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>SciCalc</RootNamespace>
     <AssemblyName>SciCalc</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
@@ -57,7 +57,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EditConstDialog.xaml.cs">
+      <DependentUpon>EditConstDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Extensions.cs" />
+    <Compile Include="HistoryEntry.cs" />
     <Compile Include="TokenRun.cs" />
     <Compile Include="Tokens\EmptyToken.cs" />
     <Compile Include="Tokens\Functions\CosFunction.cs" />
@@ -91,6 +95,10 @@
     <Compile Include="Tokens\Values\DoubleValue.cs" />
     <Compile Include="Tokens\Values\IntegerValue.cs" />
     <Compile Include="Tokens\Values\Value.cs" />
+    <Page Include="EditConstDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -34,13 +34,13 @@ namespace SciCalc.Tests
         public void Constants()
         {
             var parser = new Parser();
-            parser.SetVariable("X", 8);
+            parser.SetConstant("X", 8);
             parser.LoadToPostfix("X+3-X");
             double result = parser.Solve();
             double expected = 3;
             Assert.That(result, Is.EqualTo(expected));
 
-            parser.SetVariable("Y", 3);
+            parser.SetConstant("Y", 3);
             parser.LoadToPostfix("2*X-Y");
             result = parser.Solve();
             expected = 13;

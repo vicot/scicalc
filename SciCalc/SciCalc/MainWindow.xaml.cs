@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Shapes;
+using System.Windows.Threading;
 using SciCalc.Tokens;
+using SciCalc.Tokens.Values;
 
 namespace SciCalc
 {
@@ -24,6 +29,7 @@ namespace SciCalc
 
         private bool dontChangeRTB = false;
         private string oldExpression = "";
+        private ObservableCollection<HistoryEntry> history = new ObservableCollection<HistoryEntry>();
 
         public MainWindow()
         {
@@ -38,11 +44,36 @@ namespace SciCalc
 
         private void SolveButton_Click(object sender, RoutedEventArgs e)
         {
-            //this.parser.LoadToPostfix(this.EquationBox.Text);
-            this.parser.LoadToPostfix(this.Expression);
-            this.ResultParagraph.Inlines.Clear();
-            this.ResultParagraph.Inlines.Add(new Run(this.parser.Solve().ToString(CultureInfo.InvariantCulture)));
+            this.SolveExpression();
+        }
 
+        private void SolveExpression()
+        {
+            try
+            {
+                this.parser.LoadToPostfix(this.Expression);
+                this.ResultsBox.Foreground = Brushes.Black;
+                double result = this.parser.Solve();
+                this.SaveHistory(result);
+                this.ResultsBox.Text = result.ToString(CultureInfo.InvariantCulture);
+            }
+            catch (ParseException ex)
+            {
+                this.ResultsBox.Foreground = Brushes.DarkRed;
+                this.ResultsBox.Text = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                this.ResultsBox.Foreground = Brushes.DarkRed;
+                this.ResultsBox.Text = ex.Message;
+
+            }
+        }
+
+        private void SaveHistory(double result)
+        {
+            this.parser.SetConstant("ANS", result);
+            this.history.Add(new HistoryEntry(this.Expression, result));
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -60,14 +91,36 @@ namespace SciCalc
                         return;
 
                     case Key.C:
-                        Clipboard.SetText("Hello world", TextDataFormat.Text);
+                        if (this.caretSelection.Text.Length > 0)
+                        {
+                            Clipboard.SetText(this.caretSelection.Text, TextDataFormat.Text);
+                        }
+                        else
+                        {
+                            Clipboard.SetText(this.ResultsBox.Text, TextDataFormat.Text);
+                        }
                         return;
+
+                    case Key.R:
+                        this.ProcessKeyInput('√');
+                        return;
+
+                    case Key.Space:
+                        this.LoadHistoryEntry();
+                        return;
+
                 }
             }
             else
             {
                 switch (e.Key)
                 {
+                    case Key.Escape:
+                        this.ExpressionParagraph.Inlines.Clear();
+                        this.ResultsBox.Text = "";
+                        this.SetCursorPosition(0);
+                        return;
+
                     case Key.Back:
                         this.ProcessKeyInput((char)8);
                         return;
@@ -75,10 +128,71 @@ namespace SciCalc
                     case Key.Delete:
                         this.ProcessKeyInput((char)9);
                         return;
+
+                    case Key.Enter:
+                        this.SolveExpression();
+                        return;
+
+                    case Key.Home:
+                        this.ClearSelection();
+                        this.SetCursorPosition(0);
+                        return;
+
+                    case Key.End:
+                        this.ClearSelection();
+                        //go as far as possible
+                        this.SetCursorPosition(int.MaxValue - 1);
+                        return;
+
+                    case Key.Left:
+                        this.ClearSelection();
+                        this.SetCursorPosition(this.caretOffset - 1);
+                        return;
+
+                    case Key.Right:
+                        this.ClearSelection();
+                        this.SetCursorPosition(this.caretOffset + 1);
+                        return;
+
+                    case Key.Up:
+                        {
+                            if (this.history.Count > 0)
+                            {
+                                int index = this.HistoryListBox.SelectedIndex - 1;
+                                if (index < 0) index = 0;
+                                this.HistoryListBox.SelectedIndex = index;
+                            }
+
+                            return;
+                        }
+
+                    case Key.Down:
+                        {
+                            if (this.history.Count > 0)
+                            {
+                                int index = this.HistoryListBox.SelectedIndex + 1;
+                                if (index >= this.history.Count) index = this.history.Count-1;
+                                this.HistoryListBox.SelectedIndex = index;
+                            }
+
+                            return;
+                        }
+
+                    case Key.Space:
+                        //intercept and cancel space keypress
+                        return;
                 }
             }
 
             e.Handled = false;
+        }
+
+        private void ClearSelection()
+        {
+            if (this.caretSelection.Text.Length > 0)
+            {
+                this.ExpressionRichBox.CaretPosition = this.caretPointer;
+            }
         }
 
         private void ProcessKeyInput(string keys)
@@ -98,7 +212,7 @@ namespace SciCalc
             var range = new TextRange(this.caretSelection.Start, this.caretSelection.End);
 
             //special keys
-            if (char.IsControl(key) || key == 'd')
+            if (char.IsControl(key))
             {
                 switch ((int)key)
                 {
@@ -224,24 +338,7 @@ namespace SciCalc
 
         private void Window_TextInput(object sender, TextCompositionEventArgs e)
         {
-            //     Console.WriteLine($"[TextInput]: {Keyboard.Modifiers} - {e.Text}");
-
             bool shiftPressed = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
-
-            //handle C-v and C-c keys for paste/copy
-            //if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
-            //{
-            //    switch (e.Key)
-            //    {
-            //        case Key.V:
-            //            this.ProcessKeyInput(Clipboard.GetText(TextDataFormat.Text));
-            //            return;
-
-            //        case Key.C:
-            //            Clipboard.SetText("Hello world", TextDataFormat.Text);
-            //            return;
-            //    }
-            //}
 
             //normal keys
             if (e.Text.Length == 1)
@@ -266,11 +363,10 @@ namespace SciCalc
             e.Handled = true;
         }
 
-        private void ReformatExpression(char addedCharacter)
+        private void ReformatExpression(char addedCharacter = (char)0)
         {
             string staryexpression = this.Expression;
             List<Token> tokens = this.parser.ParseTokens(this.Expression);
-
 
             this.ExpressionParagraph.Inlines.Clear();
 
@@ -320,7 +416,7 @@ namespace SciCalc
                 {
                     if (offset >= this.oldExpression.Length) break;
                     if (this.caretOffset > 0 && offset >= this.caretOffset) break;
-                    
+
                     if (this.oldExpression[offset] != expression[offset]) break;
                 }
             }
@@ -329,8 +425,11 @@ namespace SciCalc
                 offset = this.caretOffset;
                 while (offset < expression.Length && expression[offset] != addedCharacter) offset++;
 
-                //move offset after the just added character
-                offset++;
+                if (addedCharacter != 0)
+                {
+                    //move offset after the just added character, character 0 means there was no change
+                    offset++;
+                }
             }
 
             this.SetCursorPosition(offset);
@@ -381,12 +480,50 @@ namespace SciCalc
 
             this.caretPointer = rtb.Selection.Start;
             this.caretOffset = new TextRange(rtb.Selection.Start, this.ExpressionParagraph.ContentStart).Text.Length;
+
+            var rect = rtb.Selection.End.GetCharacterRect(LogicalDirection.Forward);
+            this.CaretLine.X1 = rect.TopLeft.X;
+            this.CaretLine.Y1 = rect.TopLeft.Y;
+            this.CaretLine.X2 = rect.BottomLeft.X;
+            this.CaretLine.Y2 = rect.BottomLeft.Y;
+
+            //scroll the view
+            double scrollOffset = this.CaretLine.X1 - this.ExpressionScrollViewer.ActualWidth + 15;
+            this.ExpressionScrollViewer.ScrollToHorizontalOffset(scrollOffset);
+
+            //show left ellipsis if content is scrolled to the right
+            this.LeftEllipsis.Visibility = scrollOffset < 0 ? Visibility.Hidden : Visibility.Visible;
+
+            //show right ellipsis if remaining content is longer than scrollview's width
+            rect = this.ExpressionParagraph.ContentEnd.GetCharacterRect(LogicalDirection.Forward);
+            this.RightEllipsis.Visibility = (rect.Right - scrollOffset - this.ExpressionScrollViewer.ActualWidth) < 0 ? Visibility.Hidden : Visibility.Visible;
+
             Console.WriteLine($"### selection CHANGED: new position {this.caretOffset}");
         }
+
+        private readonly ObservableCollection<Constant> constants = new ObservableCollection<Constant>();
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.ExpressionRichBox.CaretPosition = this.ExpressionParagraph.ContentStart;
+
+            foreach (var kp in this.parser.Constants)
+            {
+                this.constants.Add(new Constant(kp.Key, kp.Value));
+            }
+
+            this.ConstantsListBox.ItemsSource = this.constants;
+            this.HistoryListBox.ItemsSource = this.history;
+
+            //start timer for blinking cursor
+            var timer = new DispatcherTimer();
+            timer.Tick += (o, args) => {
+                this.CaretLine.Visibility = this.CaretLine.Visibility == Visibility.Visible
+                    ? Visibility.Hidden
+                    : Visibility.Visible;
+            };
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Start();
         }
 
 
@@ -394,8 +531,108 @@ namespace SciCalc
         {
             if (sender is Button button)
             {
-                this.ProcessKeyInput(button.DataContext as string ?? "NIEMA");
+                this.ProcessKeyInput(button.DataContext as string ?? "?");
             }
+        }
+
+        private void ConstantsListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Constant c = this.ConstantsListBox.SelectedItem as Constant;
+            if (c != null) this.ProcessKeyInput(c.Symbol);
+        }
+
+        private void RemoveValueButton_Click(object sender, RoutedEventArgs e)
+        {
+            Constant c = this.ConstantsListBox.SelectedItem as Constant;
+            if (c != null)
+            {
+                this.parser.UnsetConstant(c.Symbol);
+                this.constants.Remove(c);
+                this.ReformatExpression();
+            }
+        }
+
+        private void AddValueButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new EditConstDialog { Owner = this };
+            bool result = dialog.ShowDialog() ?? false;
+            if (result)
+            {
+                Constant c = new Constant(dialog.ValueName, dialog.Value);
+                this.constants.Add(c);
+
+                this.parser.SetConstant(c.Symbol, c.Value);
+
+                this.ReformatExpression();
+            }
+        }
+
+        private void MenuItemEdit_Click(object sender, RoutedEventArgs e)
+        {
+            Constant c = this.ConstantsListBox.SelectedItem as Constant;
+            if (c != null)
+            {
+                var dialog = new EditConstDialog(c.Symbol, c.Value) { Owner = this };
+                bool result = dialog.ShowDialog() ?? false;
+                if (result)
+                {
+                    //value was edited. Remove old one and insert new
+                    this.parser.UnsetConstant(c.Symbol);
+
+                    c.Value = dialog.Value;
+                    c.Symbol = dialog.ValueName;
+
+                    this.parser.SetConstant(c.Symbol, c.Value);
+                    this.ReformatExpression();
+                }
+            }
+        }
+
+        private void DelButton_Click(object sender, RoutedEventArgs e)
+        {
+            //press backspace key
+            this.ProcessKeyInput((char)8);
+        }
+
+        private void AcButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.ExpressionParagraph.Inlines.Clear();
+            this.ResultsBox.Text = "";
+            this.parser.UnsetConstant("ANS");
+        }
+
+        private void MenuItemLoad_Click(object sender, RoutedEventArgs e)
+        {
+            this.LoadHistoryEntry();
+        }
+
+        private void LoadHistoryEntry()
+        {
+            var entry = this.HistoryListBox.SelectedItem as HistoryEntry;
+            if (entry == null)
+            {
+                return;
+            }
+
+            this.ExpressionParagraph.Inlines.Clear();
+            this.ExpressionParagraph.Inlines.Add(new Run(entry.Expression));
+
+            this.ResultsBox.Text = entry.Result.ToString(CultureInfo.InvariantCulture);
+
+            //scroll to end
+            this.SetCursorPosition(int.MaxValue - 1);
+            this.ReformatExpression();
+        }
+
+        private void MenuItemRemove_Click(object sender, RoutedEventArgs e)
+        {
+            var entry = this.HistoryListBox.SelectedItem as HistoryEntry;
+            this.history.Remove(entry);
+        }
+
+        private void MenuItemClearHistory_Click(object sender, RoutedEventArgs e)
+        {
+            this.history.Clear();
         }
     }
 }

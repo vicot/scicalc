@@ -11,7 +11,6 @@ namespace SciCalc.Tokens.Values
             this.ArgumentCount = 0;
             this.TokenType = TokenType.Value;
             this.IsValid = false;
-
             // constants can bind with values on the left, such as "2PI" and operators or functions (with auto * operator) on both ends
             // also, constants can stand by themselves, without anything on the left or right
             this.leftBinding = new List<Type>
@@ -33,6 +32,13 @@ namespace SciCalc.Tokens.Values
         {
             this.Value = value;
             this.IsValid = true;
+        }
+
+        public override string ErrorMessage => $"Undefined constant '{this.Symbol}'";
+
+        public override string ToString()
+        {
+            return $"{this.Symbol} = {this.Value:##.####}";
         }
     }
 }

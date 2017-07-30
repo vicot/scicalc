@@ -26,7 +26,7 @@ namespace SciCalc
         public Dictionary<string, double> Constants { get; }
 
 
-        public void SetVariable(string name, double value)
+        public void SetConstant(string name, double value)
         {
             this.Constants[name] = value;
         }
@@ -37,7 +37,7 @@ namespace SciCalc
             this.LoadToPostfix(tokens);
         }
 
-        public bool UnsetVariable(string name)
+        public bool UnsetConstant(string name)
         {
             return this.Constants.Remove(name);
         }

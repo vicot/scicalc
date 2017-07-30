@@ -13,10 +13,11 @@ namespace SciCalc.Tokens
             this.IsValid = false;
 
             //this "operator" is just bad, it should not exist, and thus doesn't bind to anything at all
-            this.leftBinding = new List<Type>();
-            this.rightBinding = new List<Type>();
+            //allow anything though, or better error handling
+            this.leftBinding = new List<Type> {null, typeof(Token)};
+            this.rightBinding = new List<Type> {null, typeof(Token)};
         }
 
-        public override string ErrorMessage => "Excessive '.' in expression.";
+        public override string ErrorMessage => "Unexpected dot '.'";
     }
 }

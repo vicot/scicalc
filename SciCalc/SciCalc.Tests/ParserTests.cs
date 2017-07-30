@@ -56,7 +56,7 @@ namespace SciCalc.Tests
             */
 
             var p = new Parser();
-            p.SetVariable("X", 2);
+            p.SetConstant("X", 2);
 
             p.LoadToPostfix("3!(3X)(100%(4))log2(2(2))");
             var result = p.Solve();
