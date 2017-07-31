@@ -27,15 +27,20 @@ namespace SciCalc
         private TextPointer caretPointer;
         private TextRange caretSelection;
 
-        private bool dontChangeRTB = false;
         private string oldExpression = "";
-        private ObservableCollection<HistoryEntry> history = new ObservableCollection<HistoryEntry>();
+        private readonly ObservableCollection<HistoryEntry> history = new ObservableCollection<HistoryEntry>();
 
         public MainWindow()
         {
             this.InitializeComponent();
             this.parser = new Parser();
 
+            //set window min size
+            this.SourceInitialized += (sender, args) =>
+            {
+                this.MinWidth = this.ActualWidth;
+                this.MinHeight = this.ActualHeight;
+            };
         }
 
         private string Expression => this.ExpressionParagraph != null
@@ -181,6 +186,7 @@ namespace SciCalc
                     case Key.Space:
                         //intercept and cancel space keypress
                         return;
+
                 }
             }
 
@@ -352,6 +358,13 @@ namespace SciCalc
                     {
                         key = char.ToUpperInvariant(key);
                     }
+
+                    if (key == ',')
+                    {
+                        //replace comma with dot, for languages that use comma as floating point
+                        key = '.';
+                    }
+
                     this.ProcessKeyInput(key);
                     return;
                 }

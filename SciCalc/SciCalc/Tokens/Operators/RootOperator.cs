@@ -19,11 +19,21 @@ namespace SciCalc.Tokens.Operators
                     typeof(Token)
                 };
             }
+            else
+            {
+                //binary version of root operator requires an explicit value on the left (used as a root's base) - don't allow calculated root bases
+                this.leftBinding = new List<Type>
+                {
+                    typeof(Values.Value),
+                    typeof(Values.Constant)
+                };
+            }
         }
 
         public override double Execute(double arg1, double arg2)
         {
-            return Math.Pow(arg2, 1.0 / arg1);
+            int sign = (arg1 < 0) ? -1 : 1;
+            return sign * Math.Pow(arg2, 1.0 / Math.Abs(arg1));
         }
 
         public override double Execute(double arg)

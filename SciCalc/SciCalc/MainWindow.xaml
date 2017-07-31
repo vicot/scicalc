@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SciCalc"
         mc:Ignorable="d"
-        Title="MainWindow" SizeToContent="Height" Width="500" ResizeMode="NoResize" Background="DarkGray" PreviewKeyDown="Window_KeyDown" 
+        Title="SciCalc" SizeToContent="Height" Width="500"  Background="DarkGray" PreviewKeyDown="Window_KeyDown" 
         PreviewTextInput="Window_TextInput" Loaded="Window_Loaded">
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -48,92 +48,101 @@
                 <ColumnDefinition Width="50"/>
                 <ColumnDefinition Width="50"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="40" />
-                <ColumnDefinition Width="40" />
-                <ColumnDefinition Width="40" />
-                <ColumnDefinition Width="40" />
-                <ColumnDefinition Width="40" />
+                <ColumnDefinition Width="200" />
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition />
 
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="60"/>
-                <RowDefinition Height="30"/>
-                <RowDefinition Height="5"/>
-                <RowDefinition Height="40" />
-                <RowDefinition Height="40" />
-                <RowDefinition Height="40" />
-                <RowDefinition Height="15" />
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="25"/>
-                <RowDefinition Height="0*" />
             </Grid.RowDefinitions>
 
-            <Button Grid.Row="5" Grid.Column="3" Margin="1" Content="1" Click="UiButton_Click" DataContext="1" Padding="0" FontSize="15"/>
-            <Button Grid.Row="5" Grid.Column="4" Margin="1" Content="2" Click="UiButton_Click" DataContext="2" Padding="0" FontSize="15"/>
-            <Button Grid.Row="5" Grid.Column="5" Margin="1" Content="3" Click="UiButton_Click" DataContext="3" Padding="0" FontSize="15"/>
-            <Button Grid.Row="4" Grid.Column="3" Margin="1" Content="4" Click="UiButton_Click" DataContext="4" Padding="0" FontSize="15"/>
-            <Button Grid.Row="4" Grid.Column="4" Margin="1" Content="5" Click="UiButton_Click" DataContext="5" Padding="0" FontSize="15"/>
-            <Button Grid.Row="4" Grid.Column="5" Margin="1" Content="6" Click="UiButton_Click" DataContext="6" Padding="0" FontSize="15"/>
-            <Button Grid.Row="3" Grid.Column="3" Margin="1" Content="7" Click="UiButton_Click" DataContext="7" Padding="0" FontSize="15"/>
-            <Button Grid.Row="3" Grid.Column="4" Margin="1" Content="8" Click="UiButton_Click" DataContext="8" Padding="0" FontSize="15"/>
-            <Button Grid.Row="3" Grid.Column="5" Margin="1" Content="9" Click="UiButton_Click" DataContext="9" Padding="0" FontSize="15"/>
-            <Button Grid.Row="6" Grid.Column="3" Margin="1" Content="0" Click="UiButton_Click" DataContext="0" Padding="0" FontSize="15" Grid.ColumnSpan="2" Grid.RowSpan="2" />
-            <Button Grid.Row="6" Grid.Column="5" Margin="1" Content="." Click="UiButton_Click" DataContext="." Padding="0" FontSize="15" Grid.RowSpan="2"/>
-
-
-            <Button Grid.Row="4" Grid.Column="6" Margin="1" Content="*" Click="UiButton_Click" DataContext="*" Padding="0" FontSize="15"/>
-            <Button Grid.Row="4" Grid.Column="7" Margin="1" Content="/" Click="UiButton_Click" DataContext="/" Padding="0" FontSize="15"/>
-            <Button Grid.Row="5" Grid.Column="6" Margin="1" Content="+" Click="UiButton_Click" DataContext="+" Padding="0" FontSize="15"/>
-            <Button Grid.Row="5" Grid.Column="7" Margin="1" Content="-" Click="UiButton_Click" DataContext="-" Padding="0" FontSize="15"/>
-
-
-            <Grid Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="5">
+            <Grid Grid.Row="0" Grid.Column="3" Grid.RowSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="40"/>
+                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="5"/>
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
                 </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Row="0" Grid.Column="0" Margin="1" Content="sin" Click="UiButton_Click" DataContext="sin(" Padding="0" FontSize="15"/>
-                <Button Grid.Row="0" Grid.Column="1" Margin="1" Content="cos" Click="UiButton_Click" DataContext="cos(" Padding="0" FontSize="15"/>
-                <Button Grid.Row="0" Grid.Column="2" Margin="1" Content="tan" Click="UiButton_Click" DataContext="tan(" Padding="0" FontSize="15"/>
-                <Button Grid.Row="1" Grid.Column="0" Margin="1" Content="ln"  Click="UiButton_Click" DataContext="ln("  Padding="0" FontSize="15"/>
-                <Button Grid.Row="1" Grid.Column="1" Margin="1" Content="log" Click="UiButton_Click" DataContext="log"  Padding="0" FontSize="15"/>
-                <Button Grid.Row="1" Grid.Column="2" Margin="1" Content="ctg" Click="UiButton_Click" DataContext="ctg(" Padding="0" FontSize="15"/>
+
+                <Button Grid.Row="5" Grid.Column="0" Margin="1" Content="1" Click="UiButton_Click" DataContext="1" Padding="0" FontSize="15"/>
+                <Button Grid.Row="5" Grid.Column="1" Margin="1" Content="2" Click="UiButton_Click" DataContext="2" Padding="0" FontSize="15"/>
+                <Button Grid.Row="5" Grid.Column="2" Margin="1" Content="3" Click="UiButton_Click" DataContext="3" Padding="0" FontSize="15"/>
+                <Button Grid.Row="4" Grid.Column="0" Margin="1" Content="4" Click="UiButton_Click" DataContext="4" Padding="0" FontSize="15"/>
+                <Button Grid.Row="4" Grid.Column="1" Margin="1" Content="5" Click="UiButton_Click" DataContext="5" Padding="0" FontSize="15"/>
+                <Button Grid.Row="4" Grid.Column="2" Margin="1" Content="6" Click="UiButton_Click" DataContext="6" Padding="0" FontSize="15"/>
+                <Button Grid.Row="3" Grid.Column="0" Margin="1" Content="7" Click="UiButton_Click" DataContext="7" Padding="0" FontSize="15"/>
+                <Button Grid.Row="3" Grid.Column="1" Margin="1" Content="8" Click="UiButton_Click" DataContext="8" Padding="0" FontSize="15"/>
+                <Button Grid.Row="3" Grid.Column="2" Margin="1" Content="9" Click="UiButton_Click" DataContext="9" Padding="0" FontSize="15"/>
+                <Button Grid.Row="6" Grid.Column="0" Margin="1" Content="0" Click="UiButton_Click" DataContext="0" Padding="0" FontSize="15" Grid.ColumnSpan="2" />
+                <Button Grid.Row="6" Grid.Column="2" Margin="1" Content="." Click="UiButton_Click" DataContext="." Padding="0" FontSize="15" />
+
+
+                <Button Grid.Row="4" Grid.Column="3" Margin="1" Content="*" Click="UiButton_Click" DataContext="*" Padding="0" FontSize="15"/>
+                <Button Grid.Row="4" Grid.Column="4" Margin="1" Content="/" Click="UiButton_Click" DataContext="/" Padding="0" FontSize="15"/>
+                <Button Grid.Row="5" Grid.Column="3" Margin="1" Content="+" Click="UiButton_Click" DataContext="+" Padding="0" FontSize="15"/>
+                <Button Grid.Row="5" Grid.Column="4" Margin="1" Content="-" Click="UiButton_Click" DataContext="-" Padding="0" FontSize="15"/>
+
+
+                <Grid Grid.Row="0" Grid.ColumnSpan="5" Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Row="0" Grid.Column="0" Margin="1" Content="sin" Click="UiButton_Click" DataContext="sin(" Padding="0" FontSize="15"/>
+                    <Button Grid.Row="0" Grid.Column="1" Margin="1" Content="cos" Click="UiButton_Click" DataContext="cos(" Padding="0" FontSize="15"/>
+                    <Button Grid.Row="0" Grid.Column="2" Margin="1" Content="tan" Click="UiButton_Click" DataContext="tan(" Padding="0" FontSize="15"/>
+                    <Button Grid.Row="1" Grid.Column="0" Margin="1" Content="ln"  Click="UiButton_Click" DataContext="ln("  Padding="0" FontSize="15"/>
+                    <Button Grid.Row="1" Grid.Column="1" Margin="1" Content="log" Click="UiButton_Click" DataContext="log"  Padding="0" FontSize="15"/>
+                    <Button Grid.Row="1" Grid.Column="2" Margin="1" Content="ctg" Click="UiButton_Click" DataContext="ctg(" Padding="0" FontSize="15"/>
+                </Grid>
+
+                <Grid Grid.Row="1" Grid.ColumnSpan="5" Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Row="0" Grid.Column="0" Margin="1" Content="(" Click="UiButton_Click" DataContext="(" Padding="0" FontSize="12"/>
+                    <Button Grid.Row="0" Grid.Column="1" Margin="1" Content=")" Click="UiButton_Click" DataContext=")" Padding="0" FontSize="12"/>
+                    <Button Grid.Row="0" Grid.Column="2" Margin="1" Content="^" Click="UiButton_Click" DataContext="^" Padding="0" FontSize="12"/>
+                    <Button Grid.Row="0" Grid.Column="3" Margin="1" Content="√" Click="UiButton_Click" DataContext="√" Padding="0" FontSize="12"/>
+                    <Button Grid.Row="0" Grid.Column="4" Margin="1" Content="!" Click="UiButton_Click" DataContext="!" Padding="0" FontSize="12"/>
+                    <Button Grid.Row="0" Grid.Column="5" Margin="1" Content="#" Click="UiButton_Click" DataContext="#" Padding="0" FontSize="12"/>
+                    <Button Grid.Row="0" Grid.Column="6" Margin="1" Content="%" Click="UiButton_Click" DataContext="%" Padding="0" FontSize="12"/>
+                </Grid>
+
+                <Button Grid.Row="3" Grid.Column="3" Margin="1" Content="DEL" Padding="0" FontSize="15" Click="DelButton_Click" />
+                <Button Grid.Row="3" Grid.Column="4" Margin="1" Content="AC"  Padding="0" FontSize="15" Click="AcButton_Click"/>
+                <Button Grid.Row="6" Grid.Column="3" Margin="1" Content="ANS" Padding="0" FontSize="15" Click="UiButton_Click" DataContext="ANS"/>
+                <Button Grid.Row="6" Grid.Column="4" Margin="1" Content="=" Click="SolveButton_Click" Padding="0" FontSize="15" />
+
             </Grid>
 
-            <Grid Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="5" >
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Row="0" Grid.Column="0" Margin="1" Content="(" Click="UiButton_Click" DataContext="(" Padding="0" FontSize="12"/>
-                <Button Grid.Row="0" Grid.Column="1" Margin="1" Content=")" Click="UiButton_Click" DataContext=")" Padding="0" FontSize="12"/>
-                <Button Grid.Row="0" Grid.Column="2" Margin="1" Content="^" Click="UiButton_Click" DataContext="^" Padding="0" FontSize="12"/>
-                <Button Grid.Row="0" Grid.Column="3" Margin="1" Content="√" Click="UiButton_Click" DataContext="√" Padding="0" FontSize="12"/>
-                <Button Grid.Row="0" Grid.Column="4" Margin="1" Content="!" Click="UiButton_Click" DataContext="!" Padding="0" FontSize="12"/>
-                <Button Grid.Row="0" Grid.Column="5" Margin="1" Content="#" Click="UiButton_Click" DataContext="#" Padding="0" FontSize="12"/>
-                <Button Grid.Row="0" Grid.Column="6" Margin="1" Content="%" Click="UiButton_Click" DataContext="%" Padding="0" FontSize="12"/>
-            </Grid>
-
-            <Button Grid.Row="3" Grid.Column="6" Margin="1" Content="DEL" Padding="0" FontSize="15" Click="DelButton_Click" />
-            <Button Grid.Row="3" Grid.Column="7" Margin="1" Content="AC"  Padding="0" FontSize="15" Click="AcButton_Click"/>
-            <Button Grid.Row="6" Grid.Column="6" Margin="1" Content="ANS" Padding="0" FontSize="15" Grid.RowSpan="2" Click="UiButton_Click" DataContext="ANS"/>
-            <Button Grid.Row="6" Grid.Column="7" Margin="1" Content="=" Click="SolveButton_Click" Padding="0" FontSize="15" Grid.RowSpan="2" />
-
-            <DockPanel Grid.ColumnSpan="2" Grid.RowSpan="7">
+            <DockPanel Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0">
                 <TextBlock Text="Constants:" DockPanel.Dock="Top" HorizontalAlignment="Center"/>
                 <ListBox x:Name="ConstantsListBox" DockPanel.Dock="Bottom"
-                    MouseDoubleClick="ConstantsListBox_MouseDoubleClick" Width="100">
+                    MouseDoubleClick="ConstantsListBox_MouseDoubleClick" >
                     <ListBox.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Delete" Click="RemoveValueButton_Click" />
@@ -144,12 +153,12 @@
 
             </DockPanel>
 
-            <Button Grid.Row="7" Grid.Column="1" Margin="1" Content="Add" Padding="0" FontSize="10"
+            <Button Grid.Row="1" Grid.Column="1" Margin="1" Content="Add" Padding="0" FontSize="10"
                     Click="AddValueButton_Click" />
-            <Button Grid.Row="7" Grid.Column="0" Margin="1" Content="Remove" Padding="0" FontSize="10"
+            <Button Grid.Row="1" Grid.Column="0" Margin="1" Content="Remove" Padding="0" FontSize="10"
                     Click="RemoveValueButton_Click" />
 
-            <DockPanel Grid.Row="0" Grid.Column="9" Grid.RowSpan="8">
+            <DockPanel Grid.Row="0" Grid.Column="5" Grid.RowSpan="2">
                 <TextBlock Text="History:" DockPanel.Dock="Top" HorizontalAlignment="Center"/>
 
                 <ListBox x:Name="HistoryListBox" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled"

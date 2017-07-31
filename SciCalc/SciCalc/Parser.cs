@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using SciCalc.Tokens;
 using SciCalc.Tokens.Functions;
@@ -208,7 +209,7 @@ namespace SciCalc
                     return new IntegerValue(long.Parse(tokenstring));
 
                 case ParseState.ValueDouble:
-                    return new DoubleValue(double.Parse(tokenstring));
+                    return new DoubleValue(double.Parse(tokenstring, NumberStyles.Any, CultureInfo.InvariantCulture));
 
                 case ParseState.Constant:
                     return this.Constants.ContainsKey(tokenstring)
