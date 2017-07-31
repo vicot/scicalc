@@ -1,4 +1,24 @@
-﻿using System;
+﻿// Parser.cs Copyright (c) 2017 vicot
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -34,7 +54,7 @@ namespace SciCalc
 
         public void LoadToPostfix(string expression)
         {
-            var tokens = this.ParseTokens(expression);
+            List<Token> tokens = this.ParseTokens(expression);
             this.LoadToPostfix(tokens);
         }
 
@@ -139,7 +159,7 @@ namespace SciCalc
                 {
                     if (state == ParseState.None)
                     {
-                        var newToken = OperatorFactory.GetToken(c, lastToken == null || (lastToken is Operator && !(lastToken is CloseParentOperator)));
+                        Token newToken = OperatorFactory.GetToken(c, lastToken == null || lastToken is Operator && !(lastToken is CloseParentOperator));
                         if (newToken is ParentOperator)
                         {
                             parentLevel++;
@@ -150,7 +170,10 @@ namespace SciCalc
                         else if (newToken is CloseParentOperator)
                         {
                             parentLevel--;
-                            if (parentLevel < 0) newToken.IsValid = false;
+                            if (parentLevel < 0)
+                            {
+                                newToken.IsValid = false;
+                            }
 
                             //save closing parenthesis as last token, so the operator right after the ) doesn't think it's unary
                             lastToken = newToken;
@@ -169,7 +192,6 @@ namespace SciCalc
                     {
                         endWord = true;
                     }
-
                 }
 
 
@@ -225,22 +247,32 @@ namespace SciCalc
 
         private void VerifyTokens(List<Token> tokens)
         {
-            if (tokens.Count == 0) return;
+            if (tokens.Count == 0)
+            {
+                return;
+            }
 
             if (!tokens.First().IsLeftBound(null))
+            {
                 tokens.First().IsValid = false;
+            }
 
-            for (int i = 1; i < tokens.Count; ++i)
+            for (var i = 1; i < tokens.Count; ++i)
             {
                 if (!tokens[i - 1].IsRightBound(tokens[i]))
+                {
                     tokens[i - 1].IsValid = false;
-                if (!tokens[i].IsLeftBound(tokens[i-1]))
+                }
+                if (!tokens[i].IsLeftBound(tokens[i - 1]))
+                {
                     tokens[i].IsValid = false;
+                }
             }
 
             if (!tokens.Last().IsRightBound(null))
+            {
                 tokens.Last().IsValid = false;
-
+            }
         }
 
         public void LoadToPostfix(List<Token> tokens)
@@ -250,7 +282,7 @@ namespace SciCalc
 
             tokens = this.InsertMissingTokens(tokens);
 
-            foreach (var token in tokens)
+            foreach (Token token in tokens)
             {
                 if (!token.IsValid)
                 {
@@ -285,7 +317,10 @@ namespace SciCalc
                             while (true)
                             {
                                 Token t = operators.Pop();
-                                if (t is ParentOperator) break;
+                                if (t is ParentOperator)
+                                {
+                                    break;
+                                }
 
                                 this.PostfixNotation.Push(t);
                             }
@@ -293,7 +328,8 @@ namespace SciCalc
                             //skip pushing of ) operator
                             continue;
                         }
-                        else if (token.Priority > 0 && operators.Count > 0)
+
+                        if (token.Priority > 0 && operators.Count > 0)
                         {
                             Token top = operators.Peek();
                             if (top.Priority >= token.Priority)
@@ -301,8 +337,15 @@ namespace SciCalc
                                 while (operators.Count > 0)
                                 {
                                     Token t = operators.Peek();
-                                    if (t is ParentOperator) break; // dump only from inside parent
-                                    if (t.Priority < token.Priority) break; // dump only operators with higher priority
+                                    if (t is ParentOperator)
+                                    {
+                                        break; // dump only from inside parent
+                                    }
+                                    if (t.Priority < token.Priority)
+                                    {
+                                        break; // dump only operators with higher priority
+                                    }
+
                                     this.PostfixNotation.Push(operators.Pop());
                                 }
                             }
@@ -325,7 +368,7 @@ namespace SciCalc
             //we will clone the original list and insert missing * operators between some tokens
             var newTokens = new List<Token>();
 
-            for (int i = 0; i < tokens.Count-1; ++i)
+            for (var i = 0; i < tokens.Count - 1; ++i)
             {
                 newTokens.Add(tokens[i]);
 
@@ -340,19 +383,17 @@ namespace SciCalc
                  * don't add multiplication for logartihm case: log2(...)
                  */
                 if (
-                    (tokens[i].TokenType == TokenType.Value && tokens[i + 1].TokenType == TokenType.Value) ||
-                    (tokens[i].TokenType == TokenType.Value && tokens[i + 1].TokenType == TokenType.Function) ||
-                    (tokens[i].TokenType == TokenType.Value && tokens[i + 1] is ParentOperator && (i == 0 || !(tokens[i - 1] is LogFunction))) ||
-                    (tokens[i] is PercentOperator && tokens[i + 1] is ParentOperator) ||
-                    (tokens[i] is FactorialOperator && tokens[i + 1] is ParentOperator) ||
-                    (tokens[i] is CloseParentOperator && tokens[i + 1].TokenType == TokenType.Value) ||
-                    (tokens[i] is CloseParentOperator && tokens[i + 1].TokenType == TokenType.Function) ||
-                    (tokens[i] is CloseParentOperator && tokens[i + 1] is ParentOperator))
+                    tokens[i].TokenType == TokenType.Value && tokens[i + 1].TokenType == TokenType.Value ||
+                    tokens[i].TokenType == TokenType.Value && tokens[i + 1].TokenType == TokenType.Function ||
+                    tokens[i].TokenType == TokenType.Value && tokens[i + 1] is ParentOperator && (i == 0 || !(tokens[i - 1] is LogFunction)) ||
+                    tokens[i] is PercentOperator && tokens[i + 1] is ParentOperator ||
+                    tokens[i] is FactorialOperator && tokens[i + 1] is ParentOperator ||
+                    tokens[i] is CloseParentOperator && tokens[i + 1].TokenType == TokenType.Value ||
+                    tokens[i] is CloseParentOperator && tokens[i + 1].TokenType == TokenType.Function ||
+                    tokens[i] is CloseParentOperator && tokens[i + 1] is ParentOperator)
                 {
                     newTokens.Add(new MulOperator());
                 }
-
-
             }
 
             //add the last token that was ommited in the loop
@@ -379,7 +420,7 @@ namespace SciCalc
                         double arg = results.Pop();
                         results.Push(token.Execute(arg));
                     }
-                    else if(token.ArgumentCount == 2)
+                    else if (token.ArgumentCount == 2)
                     {
                         double arg2 = results.Pop();
                         double arg1 = results.Pop();
