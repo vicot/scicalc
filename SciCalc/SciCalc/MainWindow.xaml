@@ -124,17 +124,17 @@
                         <ColumnDefinition />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Row="0" Grid.Column="0" Margin="1" Content="(" Click="UiButton_Click" DataContext="(" Padding="0" FontSize="12" />
-                    <Button Grid.Row="0" Grid.Column="1" Margin="1" Content=")" Click="UiButton_Click" DataContext=")" Padding="0" FontSize="12" />
-                    <Button Grid.Row="0" Grid.Column="2" Margin="1" Content="^" Click="UiButton_Click" DataContext="^" Padding="0" FontSize="12" />
-                    <Button Grid.Row="0" Grid.Column="3" Margin="1" Content="√" Click="UiButton_Click" DataContext="√" Padding="0" FontSize="12" />
-                    <Button Grid.Row="0" Grid.Column="4" Margin="1" Content="!" Click="UiButton_Click" DataContext="!" Padding="0" FontSize="12" />
-                    <Button Grid.Row="0" Grid.Column="5" Margin="1" Content="#" Click="UiButton_Click" DataContext="#" Padding="0" FontSize="12" />
-                    <Button Grid.Row="0" Grid.Column="6" Margin="1" Content="%" Click="UiButton_Click" DataContext="%" Padding="0" FontSize="12" />
+                    <Button Grid.Row="0" Grid.Column="0" Margin="1" Content="(" Click="UiButton_Click" DataContext="(" Padding="0" FontSize="12" ToolTip="Open parenthesis"/>
+                    <Button Grid.Row="0" Grid.Column="1" Margin="1" Content=")" Click="UiButton_Click" DataContext=")" Padding="0" FontSize="12" ToolTip="Close parenthesis"/>
+                    <Button Grid.Row="0" Grid.Column="2" Margin="1" Content="^" Click="UiButton_Click" DataContext="^" Padding="0" FontSize="12" ToolTip="Power operator"/>
+                    <Button Grid.Row="0" Grid.Column="3" Margin="1" Content="√" Click="UiButton_Click" DataContext="√" Padding="0" FontSize="12" ToolTip="Root operator [ctrl-r]"/>
+                    <Button Grid.Row="0" Grid.Column="4" Margin="1" Content="!" Click="UiButton_Click" DataContext="!" Padding="0" FontSize="12" ToolTip="Factorial operator"/>
+                    <Button Grid.Row="0" Grid.Column="5" Margin="1" Content="#" Click="UiButton_Click" DataContext="#" Padding="0" FontSize="12" ToolTip="Modulo operator"/>
+                    <Button Grid.Row="0" Grid.Column="6" Margin="1" Content="%" Click="UiButton_Click" DataContext="%" Padding="0" FontSize="12" ToolTip="Percent operator"/>
                 </Grid>
 
-                <Button Grid.Row="3" Grid.Column="3" Margin="1" Content="DEL" Padding="0" FontSize="15" Click="DelButton_Click" />
-                <Button Grid.Row="3" Grid.Column="4" Margin="1" Content="AC" Padding="0" FontSize="15" Click="AcButton_Click" />
+                <Button Grid.Row="3" Grid.Column="3" Margin="1" Content="DEL" Padding="0" FontSize="15" Click="DelButton_Click" ToolTip="Delete character from expression"/>
+                <Button Grid.Row="3" Grid.Column="4" Margin="1" Content="AC" Padding="0" FontSize="15" Click="AcButton_Click" ToolTip="Clear all"/>
                 <Button Grid.Row="6" Grid.Column="3" Margin="1" Content="ANS" Padding="0" FontSize="15" Click="UiButton_Click" DataContext="ANS" />
                 <Button Grid.Row="6" Grid.Column="4" Margin="1" Content="=" Click="SolveButton_Click" Padding="0" FontSize="15" />
 
@@ -154,10 +154,8 @@
 
             </DockPanel>
 
-            <Button Grid.Row="1" Grid.Column="1" Margin="1" Content="Add" Padding="0" FontSize="10"
-                    Click="AddValueButton_Click" />
-            <Button Grid.Row="1" Grid.Column="0" Margin="1" Content="Remove" Padding="0" FontSize="10"
-                    Click="RemoveValueButton_Click" />
+            <Button Grid.Row="1" Grid.Column="1" Margin="1" Content="Add" Padding="0" FontSize="10" Click="AddValueButton_Click" ToolTip="Add new constant"/>
+            <Button Grid.Row="1" Grid.Column="0" Margin="1" Content="Remove" Padding="0" FontSize="10" Click="RemoveValueButton_Click" ToolTip="Remove selected constant"/>
 
             <DockPanel Grid.Row="0" Grid.Column="5" Grid.RowSpan="2">
                 <TextBlock Text="History:" DockPanel.Dock="Top" HorizontalAlignment="Center" />
