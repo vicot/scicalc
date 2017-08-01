@@ -42,11 +42,9 @@ namespace SciCalc
         private readonly ObservableCollection<Constant> constants = new ObservableCollection<Constant>();
         private readonly ObservableCollection<HistoryEntry> history = new ObservableCollection<HistoryEntry>();
         private readonly Parser parser;
-
         private int caretOffset;
         private TextPointer caretPointer;
         private TextRange caretSelection;
-
         private string oldExpression = "";
 
         public MainWindow()
@@ -66,9 +64,10 @@ namespace SciCalc
             ? new TextRange(this.ExpressionParagraph.ContentStart, this.ExpressionParagraph.ContentEnd).Text
             : "";
 
-        private void SolveButton_Click(object sender, RoutedEventArgs e)
+        private void SaveHistory(double result)
         {
-            this.SolveExpression();
+            this.parser.SetConstant("ANS", result);
+            this.history.Add(new HistoryEntry(this.Expression, result));
         }
 
         private void SolveExpression()
@@ -93,10 +92,317 @@ namespace SciCalc
             }
         }
 
-        private void SaveHistory(double result)
+        private void ClearSelection()
         {
-            this.parser.SetConstant("ANS", result);
-            this.history.Add(new HistoryEntry(this.Expression, result));
+            if (this.caretSelection.Text.Length > 0)
+            {
+                this.ExpressionRichBox.CaretPosition = this.caretPointer;
+            }
+        }
+
+        private void ProcessKeyInput(string keys)
+        {
+            foreach (char key in keys)
+            {
+                this.ProcessKeyInput(key);
+            }
+        }
+
+        private void ProcessKeyInput(char key)
+        {
+            if (this.caretPointer == null)
+            {
+                this.caretPointer = this.ExpressionParagraph.ContentStart;
+            }
+            var range = new TextRange(this.caretSelection.Start, this.caretSelection.End);
+
+            //special keys
+            if (char.IsControl(key))
+            {
+                switch ((int) key)
+                {
+                    case 8: //backspace
+                    {
+                        if (range.IsEmpty)
+                        {
+                            TextPointer previousPosition =
+                                this.caretSelection.End.GetNextInsertionPosition(LogicalDirection.Backward);
+                            if (previousPosition != null)
+                            {
+                                range = new TextRange(previousPosition, this.caretSelection.End);
+
+                                //when deleting space, delete the character before it
+                                if (range.Text == " ")
+                                {
+                                    previousPosition =
+                                        previousPosition.GetNextInsertionPosition(LogicalDirection.Backward);
+                                    if (previousPosition != null)
+                                    {
+                                        range = new TextRange(previousPosition, this.caretSelection.End);
+                                    }
+                                }
+                            }
+                        }
+
+                        //add space before the range if needed
+
+                        string charactersbefore =
+                            range.Start.GetNextInsertionPosition(LogicalDirection.Backward)?
+                                .GetTextInRun(LogicalDirection.Forward) ?? "";
+                        if (charactersbefore.Length > 0 && charactersbefore[0] == ' ')
+                        {
+                            range = new TextRange(range.Start.GetNextInsertionPosition(LogicalDirection.Backward),
+                                                  range.End);
+                        }
+
+                        //nothing to remove, cancel operation
+                        if (range.Text.Length == 0)
+                        {
+                            return;
+                        }
+
+
+                        range.Text = "";
+                        break;
+                    }
+
+                    case 9: //delete
+                    {
+                        if (range.IsEmpty)
+                        {
+                            TextPointer nextPosition =
+                                this.caretSelection.End.GetNextInsertionPosition(LogicalDirection.Forward);
+                            if (nextPosition != null)
+                            {
+                                range = new TextRange(this.caretSelection.End, nextPosition);
+
+                                //when deleting space, delete the character after it
+                                if (range.Text == " ")
+                                {
+                                    nextPosition =
+                                        nextPosition.GetNextInsertionPosition(LogicalDirection.Forward);
+                                    if (nextPosition != null)
+                                    {
+                                        range = new TextRange(this.caretSelection.End, nextPosition);
+                                    }
+                                }
+                            }
+                        }
+
+                        //add space after the range if needed
+
+                        string charactersafter =
+                            range.End.GetNextInsertionPosition(LogicalDirection.Forward)?
+                                .GetTextInRun(LogicalDirection.Backward) ?? "";
+                        if (charactersafter.Length > 0 && charactersafter.Last() == ' ')
+                        {
+                            range = new TextRange(range.Start, range.End.GetNextInsertionPosition(LogicalDirection.Forward));
+                        }
+
+                        //nothing to remove, cancel operation
+                        if (range.Text.Length == 0)
+                        {
+                            return;
+                        }
+
+
+                        range.Text = "";
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                switch (key)
+                {
+                    case '(': //add closing )
+                        range.Text = "()";
+                        break;
+
+                    case ')': // ) are autogenerated, skip if was writing next ) just before an existing )
+                    {
+                        string expr = this.Expression;
+                        int offset = this.caretOffset;
+                        if (offset >= expr.Length || expr[offset] != ')' &&
+                            (expr.Length <= offset || expr[offset] != ' ' ||
+                             expr[offset + 1] != ')'))
+                        {
+                            range.Text = ")";
+                        }
+
+                        break;
+                    }
+
+                    default:
+                        range.Text = key.ToString();
+                        break;
+                }
+            }
+
+
+            this.ReformatExpression(key);
+        }
+
+        private void LoadHistoryEntry()
+        {
+            var entry = this.HistoryListBox.SelectedItem as HistoryEntry;
+            if (entry == null)
+            {
+                return;
+            }
+
+
+            this.ExpressionParagraph.Inlines.Clear();
+            this.ExpressionParagraph.Inlines.Add(new Run(entry.Expression));
+
+            this.ResultsBox.Text = entry.Result.ToString(CultureInfo.InvariantCulture);
+
+            //scroll to end
+            this.SetCursorPosition(int.MaxValue - 1);
+            this.ReformatExpression();
+        }
+
+        private void ReformatExpression(char addedCharacter = (char) 0)
+        {
+            List<Token> tokens = this.parser.ParseTokens(this.Expression);
+
+            this.ExpressionParagraph.Inlines.Clear();
+
+            if (tokens.Count == 0)
+            {
+                this.oldExpression = "";
+                this.SetCursorPosition(0);
+                return;
+            }
+
+
+            var run = new TokenRun(tokens.First());
+            this.ExpressionParagraph.Inlines.Add(run);
+            foreach (Token token in tokens.Skip(1))
+            {
+                this.ExpressionParagraph.Inlines.AddRange(run.ConnectToken(token));
+                run = (TokenRun) this.ExpressionParagraph.Inlines.LastInline;
+            }
+
+
+            string expression = this.Expression; //updated layout
+
+            //int offset = this.caretOffset  + (staryexpression.Length - this.oldExpression.Length);
+            int offset;
+            if (addedCharacter == 8)
+            {
+                //backspace, find first difference from previous string
+                for (offset = 0; offset < expression.Length; ++offset)
+                {
+                    if (offset >= this.oldExpression.Length)
+                    {
+                        break;
+                    }
+                    if (this.caretOffset > 0 && offset >= this.caretOffset)
+                    {
+                        break;
+                    }
+                    if (this.caretOffset > 1 && this.oldExpression[this.caretOffset - 1] == ' ' &&
+                        offset >= this.caretOffset - 1)
+                    {
+                        break;
+                    }
+
+                    if (this.oldExpression[offset] != expression[offset])
+                    {
+                        break;
+                    }
+                }
+            }
+            else if (addedCharacter == 9)
+            {
+                //delete, find first difference from previous string
+                for (offset = 0; offset < expression.Length; ++offset)
+                {
+                    if (offset >= this.oldExpression.Length)
+                    {
+                        break;
+                    }
+                    if (this.caretOffset > 0 && offset >= this.caretOffset)
+                    {
+                        break;
+                    }
+
+                    if (this.oldExpression[offset] != expression[offset])
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                offset = this.caretOffset;
+                while (offset < expression.Length && expression[offset] != addedCharacter)
+                {
+                    offset++;
+                }
+
+
+                if (addedCharacter != 0)
+                {
+                    //move offset after the just added character, character 0 means there was no change
+                    offset++;
+                }
+            }
+
+
+            this.SetCursorPosition(offset);
+
+            this.oldExpression = expression;
+        }
+
+        private void SetCursorPosition(int offset)
+        {
+            TextPointer tp = this.ExpressionParagraph.ContentStart;
+            for (var o = 0; o < offset + 1; ++o)
+            {
+                TextPointer nextTp = tp.GetNextInsertionPosition(LogicalDirection.Forward);
+                if (nextTp != null)
+                {
+                    tp = nextTp;
+                }
+                else
+                {
+                    break; //EOL?
+                }
+            }
+
+
+            this.ExpressionRichBox.CaretPosition = tp;
+        }
+
+        private void SolveButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.SolveExpression();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.ExpressionRichBox.CaretPosition = this.ExpressionParagraph.ContentStart;
+
+            foreach (KeyValuePair<string, double> kp in this.parser.Constants)
+            {
+                this.constants.Add(new Constant(kp.Key, kp.Value));
+            }
+
+            this.ConstantsListBox.ItemsSource = this.constants;
+            this.HistoryListBox.ItemsSource = this.history;
+
+            //start timer for blinking cursor
+            var timer = new DispatcherTimer();
+            timer.Tick += (o, args) =>
+            {
+                this.CaretLine.Visibility = this.CaretLine.Visibility == Visibility.Visible
+                    ? Visibility.Hidden
+                    : Visibility.Visible;
+            };
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Start();
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -212,155 +518,8 @@ namespace SciCalc
                 }
             }
 
+
             e.Handled = false;
-        }
-
-        private void ClearSelection()
-        {
-            if (this.caretSelection.Text.Length > 0)
-            {
-                this.ExpressionRichBox.CaretPosition = this.caretPointer;
-            }
-        }
-
-        private void ProcessKeyInput(string keys)
-        {
-            foreach (char key in keys)
-            {
-                this.ProcessKeyInput(key);
-            }
-        }
-
-        private void ProcessKeyInput(char key)
-        {
-            if (this.caretPointer == null)
-            {
-                this.caretPointer = this.ExpressionParagraph.ContentStart;
-            }
-            var range = new TextRange(this.caretSelection.Start, this.caretSelection.End);
-
-            //special keys
-            if (char.IsControl(key))
-            {
-                switch ((int) key)
-                {
-                    case 8: //backspace
-                    {
-                        if (range.IsEmpty)
-                        {
-                            TextPointer previousPosition =
-                                this.caretSelection.End.GetNextInsertionPosition(LogicalDirection.Backward);
-                            if (previousPosition != null)
-                            {
-                                range = new TextRange(previousPosition, this.caretSelection.End);
-
-                                //when deleting space, delete the character before it
-                                if (range.Text == " ")
-                                {
-                                    previousPosition =
-                                        previousPosition.GetNextInsertionPosition(LogicalDirection.Backward);
-                                    if (previousPosition != null)
-                                    {
-                                        range = new TextRange(previousPosition, this.caretSelection.End);
-                                    }
-                                }
-                            }
-                        }
-
-                        //add space before the range if needed
-
-                        string charactersbefore =
-                            range.Start.GetNextInsertionPosition(LogicalDirection.Backward)?
-                                .GetTextInRun(LogicalDirection.Forward) ?? "";
-                        if (charactersbefore.Length > 0 && charactersbefore[0] == ' ')
-                        {
-                            range = new TextRange(range.Start.GetNextInsertionPosition(LogicalDirection.Backward),
-                                                  range.End);
-                        }
-
-                        //nothing to remove, cancel operation
-                        if (range.Text.Length == 0)
-                        {
-                            return;
-                        }
-
-                        range.Text = "";
-                        break;
-                    }
-
-                    case 9: //delete
-                    {
-                        if (range.IsEmpty)
-                        {
-                            TextPointer nextPosition =
-                                this.caretSelection.End.GetNextInsertionPosition(LogicalDirection.Forward);
-                            if (nextPosition != null)
-                            {
-                                range = new TextRange(this.caretSelection.End, nextPosition);
-
-                                //when deleting space, delete the character after it
-                                if (range.Text == " ")
-                                {
-                                    nextPosition =
-                                        nextPosition.GetNextInsertionPosition(LogicalDirection.Forward);
-                                    if (nextPosition != null)
-                                    {
-                                        range = new TextRange(this.caretSelection.End, nextPosition);
-                                    }
-                                }
-                            }
-                        }
-
-                        //add space after the range if needed
-
-                        string charactersafter =
-                            range.End.GetNextInsertionPosition(LogicalDirection.Forward)?
-                                .GetTextInRun(LogicalDirection.Backward) ?? "";
-                        if (charactersafter.Length > 0 && charactersafter.Last() == ' ')
-                        {
-                            range = new TextRange(range.Start, range.End.GetNextInsertionPosition(LogicalDirection.Forward));
-                        }
-
-                        //nothing to remove, cancel operation
-                        if (range.Text.Length == 0)
-                        {
-                            return;
-                        }
-
-                        range.Text = "";
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                switch (key)
-                {
-                    case '(': //add closing )
-                        range.Text = "()";
-                        break;
-
-                    case ')': // ) are autogenerated, skip if was writing next ) just before an existing )
-                    {
-                        string expr = this.Expression;
-                        int offset = this.caretOffset;
-                        if (offset >= expr.Length || expr[offset] != ')' &&
-                            (expr.Length <= offset || expr[offset] != ' ' ||
-                             expr[offset + 1] != ')'))
-                        {
-                            range.Text = ")";
-                        }
-
-                        break;
-                    }
-
-                    default:
-                        range.Text = key.ToString();
-                        break;
-                }
-            }
-
-            this.ReformatExpression(key);
         }
 
         private void Window_TextInput(object sender, TextCompositionEventArgs e)
@@ -394,126 +553,8 @@ namespace SciCalc
                 this.ProcessKeyInput(key);
             }
 
+
             e.Handled = true;
-        }
-
-        private void ReformatExpression(char addedCharacter = (char) 0)
-        {
-            string staryexpression = this.Expression;
-            List<Token> tokens = this.parser.ParseTokens(this.Expression);
-
-            this.ExpressionParagraph.Inlines.Clear();
-
-            if (tokens.Count == 0)
-            {
-                this.oldExpression = "";
-                this.SetCursorPosition(0);
-                return;
-            }
-
-            var run = new TokenRun(tokens.First());
-            this.ExpressionParagraph.Inlines.Add(run);
-            foreach (Token token in tokens.Skip(1))
-            {
-                this.ExpressionParagraph.Inlines.AddRange(run.ConnectToken(token));
-                run = (TokenRun) this.ExpressionParagraph.Inlines.LastInline;
-            }
-
-            string expression = this.Expression; //updated layout
-
-
-            Console.WriteLine($"[RTB] {this.caretOffset} diff {expression.Length - this.oldExpression.Length}");
-            Console.WriteLine($"   {this.oldExpression}[{this.oldExpression.Length}");
-            Console.WriteLine($"   {staryexpression}[{staryexpression.Length}");
-            Console.WriteLine($"   {expression}[{expression.Length}");
-
-            //int offset = this.caretOffset  + (staryexpression.Length - this.oldExpression.Length);
-            int offset;
-            if (addedCharacter == 8)
-            {
-                //backspace, find first difference from previous string
-                for (offset = 0; offset < expression.Length; ++offset)
-                {
-                    if (offset >= this.oldExpression.Length)
-                    {
-                        break;
-                    }
-                    if (this.caretOffset > 0 && offset >= this.caretOffset)
-                    {
-                        break;
-                    }
-                    if (this.caretOffset > 1 && this.oldExpression[this.caretOffset - 1] == ' ' &&
-                        offset >= this.caretOffset - 1)
-                    {
-                        break;
-                    }
-
-                    if (this.oldExpression[offset] != expression[offset])
-                    {
-                        break;
-                    }
-                }
-            }
-            else if (addedCharacter == 9)
-            {
-                //delete, find first difference from previous string
-                for (offset = 0; offset < expression.Length; ++offset)
-                {
-                    if (offset >= this.oldExpression.Length)
-                    {
-                        break;
-                    }
-                    if (this.caretOffset > 0 && offset >= this.caretOffset)
-                    {
-                        break;
-                    }
-
-                    if (this.oldExpression[offset] != expression[offset])
-                    {
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                offset = this.caretOffset;
-                while (offset < expression.Length && expression[offset] != addedCharacter)
-                {
-                    offset++;
-                }
-
-                if (addedCharacter != 0)
-                {
-                    //move offset after the just added character, character 0 means there was no change
-                    offset++;
-                }
-            }
-
-            this.SetCursorPosition(offset);
-
-            this.oldExpression = expression;
-        }
-
-        private void SetCursorPosition(int offset)
-        {
-            TextPointer tp = this.ExpressionParagraph.ContentStart;
-            Console.WriteLine($"     setting offset {offset}");
-            for (var o = 0; o < offset + 1; ++o)
-            {
-                Console.WriteLine($"        {o}");
-                TextPointer nextTp = tp.GetNextInsertionPosition(LogicalDirection.Forward);
-                if (nextTp != null)
-                {
-                    tp = nextTp;
-                }
-                else
-                {
-                    Console.WriteLine("         EOL?");
-                    break; //EOL?
-                }
-            }
-
-            this.ExpressionRichBox.CaretPosition = tp;
         }
 
         private void RichTextBox_SelectionChanged(object sender, RoutedEventArgs e)
@@ -554,60 +595,14 @@ namespace SciCalc
             //show right ellipsis if remaining content is longer than scrollview's width
             rect = this.ExpressionParagraph.ContentEnd.GetCharacterRect(LogicalDirection.Forward);
             this.RightEllipsis.Visibility = rect.Right - scrollOffset - this.ExpressionScrollViewer.ActualWidth < 0 ? Visibility.Hidden : Visibility.Visible;
-
-            Console.WriteLine($"### selection CHANGED: new position {this.caretOffset}");
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            this.ExpressionRichBox.CaretPosition = this.ExpressionParagraph.ContentStart;
-
-            foreach (KeyValuePair<string, double> kp in this.parser.Constants)
-            {
-                this.constants.Add(new Constant(kp.Key, kp.Value));
-            }
-
-            this.ConstantsListBox.ItemsSource = this.constants;
-            this.HistoryListBox.ItemsSource = this.history;
-
-            //start timer for blinking cursor
-            var timer = new DispatcherTimer();
-            timer.Tick += (o, args) =>
-            {
-                this.CaretLine.Visibility = this.CaretLine.Visibility == Visibility.Visible
-                    ? Visibility.Hidden
-                    : Visibility.Visible;
-            };
-            timer.Interval = TimeSpan.FromSeconds(1);
-            timer.Start();
-        }
-
-
-        private void UiButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button button)
-            {
-                this.ProcessKeyInput(button.DataContext as string ?? "?");
-            }
         }
 
         private void ConstantsListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var c = this.ConstantsListBox.SelectedItem as Constant;
+            Constant c = this.ConstantsListBox.SelectedItem as Constant;
             if (c != null)
             {
                 this.ProcessKeyInput(c.Symbol);
-            }
-        }
-
-        private void RemoveValueButton_Click(object sender, RoutedEventArgs e)
-        {
-            var c = this.ConstantsListBox.SelectedItem as Constant;
-            if (c != null)
-            {
-                this.parser.UnsetConstant(c.Symbol);
-                this.constants.Remove(c);
-                this.ReformatExpression();
             }
         }
 
@@ -626,9 +621,41 @@ namespace SciCalc
             }
         }
 
+        private void RemoveValueButton_Click(object sender, RoutedEventArgs e)
+        {
+            Constant c = this.ConstantsListBox.SelectedItem as Constant;
+            if (c != null)
+            {
+                this.parser.UnsetConstant(c.Symbol);
+                this.constants.Remove(c);
+                this.ReformatExpression();
+            }
+        }
+
+        private void UiButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button)
+            {
+                this.ProcessKeyInput(button.DataContext as string ?? "?");
+            }
+        }
+
+        private void DelButton_Click(object sender, RoutedEventArgs e)
+        {
+            //press backspace key
+            this.ProcessKeyInput((char) 8);
+        }
+
+        private void AcButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.ExpressionParagraph.Inlines.Clear();
+            this.ResultsBox.Text = "";
+            this.parser.UnsetConstant("ANS");
+        }
+
         private void MenuItemEdit_Click(object sender, RoutedEventArgs e)
         {
-            var c = this.ConstantsListBox.SelectedItem as Constant;
+            Constant c = this.ConstantsListBox.SelectedItem as Constant;
             if (c != null)
             {
                 var dialog = new EditConstDialog(c.Symbol, c.Value) {Owner = this};
@@ -647,40 +674,9 @@ namespace SciCalc
             }
         }
 
-        private void DelButton_Click(object sender, RoutedEventArgs e)
-        {
-            //press backspace key
-            this.ProcessKeyInput((char) 8);
-        }
-
-        private void AcButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.ExpressionParagraph.Inlines.Clear();
-            this.ResultsBox.Text = "";
-            this.parser.UnsetConstant("ANS");
-        }
-
         private void MenuItemLoad_Click(object sender, RoutedEventArgs e)
         {
             this.LoadHistoryEntry();
-        }
-
-        private void LoadHistoryEntry()
-        {
-            var entry = this.HistoryListBox.SelectedItem as HistoryEntry;
-            if (entry == null)
-            {
-                return;
-            }
-
-            this.ExpressionParagraph.Inlines.Clear();
-            this.ExpressionParagraph.Inlines.Add(new Run(entry.Expression));
-
-            this.ResultsBox.Text = entry.Result.ToString(CultureInfo.InvariantCulture);
-
-            //scroll to end
-            this.SetCursorPosition(int.MaxValue - 1);
-            this.ReformatExpression();
         }
 
         private void MenuItemRemove_Click(object sender, RoutedEventArgs e)

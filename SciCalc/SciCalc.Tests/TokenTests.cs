@@ -1,6 +1,5 @@
 ﻿using System;
 using NUnit.Framework;
-using SciCalc.Tokens;
 using SciCalc.Tokens.Operators;
 using SciCalc.Tokens.Values;
 

@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SciCalc"
+        xmlns:sciCalc="clr-namespace:SciCalc"
         mc:Ignorable="d"
         Title="SciCalc" SizeToContent="Height" Width="500" Background="DarkGray" PreviewKeyDown="Window_KeyDown"
         PreviewTextInput="Window_TextInput" Loaded="Window_Loaded">
@@ -25,7 +25,7 @@
                     <TextBlock x:Name="RightEllipsis" Text="..." DockPanel.Dock="Right" VerticalAlignment="Center" Visibility="Visible" Margin="5,0,2,0" />
                     <ScrollViewer x:Name="ExpressionScrollViewer" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Hidden">
                         <Canvas Width="10000">
-                            <RichTextBox Grid.Row="0" x:Name="ExpressionRichBox" Background="Transparent" BorderThickness="0" Width="10000" CaretBrush="Transparent" HorizontalAlignment="Center"
+                            <RichTextBox x:Name="ExpressionRichBox" Background="Transparent" BorderThickness="0" Width="10000" CaretBrush="Transparent" HorizontalAlignment="Center"
                                          HorizontalScrollBarVisibility="Disabled"
                                          FontSize="10" IsReadOnlyCaretVisible="True" AcceptsReturn="False" AcceptsTab="False" IsReadOnly="True"
                                          Cursor="Arrow" SelectionChanged="RichTextBox_SelectionChanged" IsUndoEnabled="False" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
@@ -165,7 +165,7 @@
                 <ListBox x:Name="HistoryListBox" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          MouseDoubleClick="ConstantsListBox_MouseDoubleClick" ItemTemplate="{DynamicResource HistoryItemTemplate}">
                     <ListBox.Resources>
-                        <DataTemplate x:Key="HistoryItemTemplate">
+                        <DataTemplate x:Key="HistoryItemTemplate" DataType="sciCalc:HistoryEntry">
                             <Border BorderThickness="0,0,0,2" Margin="0,2" BorderBrush="LightGray" Width="Auto">
                                 <Grid>
                                     <Grid.RowDefinitions>

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 using SciCalc.Tokens;
 using SciCalc.Tokens.Operators;
@@ -13,8 +12,6 @@ namespace SciCalc.Tests
         [Test]
         public void TokenizeExpression()
         {
-            var expression = "15 + 3 - 6 * 10.3.5 + (1) - -3";
-
             var expected = new List<Token>
             {
                 new IntegerValue(15),
@@ -36,7 +33,7 @@ namespace SciCalc.Tests
             };
 
             var p = new Parser();
-            var result = p.ParseTokens(expression);
+            var result = p.ParseTokens("15 + 3 - 6 * 10.3.5 + (1) - -3");
 
             Assert.That(result, Is.EquivalentTo(expected));
         }

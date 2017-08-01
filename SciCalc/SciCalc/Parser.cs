@@ -39,29 +39,11 @@ namespace SciCalc
                 {"E", Math.E}
             };
             this.PostfixNotation = new Stack<Token>();
-            new Stack<Token>();
         }
 
-        public Stack<Token> PostfixNotation { get; }
+        private Stack<Token> PostfixNotation { get; }
 
         public Dictionary<string, double> Constants { get; }
-
-
-        public void SetConstant(string name, double value)
-        {
-            this.Constants[name] = value;
-        }
-
-        public void LoadToPostfix(string expression)
-        {
-            List<Token> tokens = this.ParseTokens(expression);
-            this.LoadToPostfix(tokens);
-        }
-
-        public bool UnsetConstant(string name)
-        {
-            return this.Constants.Remove(name);
-        }
 
         public List<Token> ParseTokens(string expression)
         {
@@ -184,8 +166,6 @@ namespace SciCalc
                             lastToken = newToken;
                         }
 
-                        //don't add excessive parents
-                        //if(newToken != null)
                         tokenList.Add(newToken);
                     }
                     else
@@ -211,12 +191,6 @@ namespace SciCalc
             {
                 tokenList.Add(this.ParseLongToken(expression, state, startPosition, expression.Length));
             }
-
-//            while (parentLevel-- > 0)
-//            {
-//                //autoclose remaining parents
-//                tokenList.Add(new CloseParentOperator{Inferred = true});
-//            }
 
             this.VerifyTokens(tokenList);
             return tokenList;
@@ -275,8 +249,9 @@ namespace SciCalc
             }
         }
 
-        public void LoadToPostfix(List<Token> tokens)
+        public void LoadToPostfix(string expression)
         {
+            List<Token> tokens = this.ParseTokens(expression);
             this.PostfixNotation.Clear();
             var operators = new Stack<Token>();
 
@@ -435,6 +410,16 @@ namespace SciCalc
             }
 
             return results.Pop();
+        }
+
+        public void SetConstant(string name, double value)
+        {
+            this.Constants[name] = value;
+        }
+
+        public bool UnsetConstant(string name)
+        {
+            return this.Constants.Remove(name);
         }
 
         private enum ParseState

@@ -21,7 +21,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SciCalc.Tokens
+namespace SciCalc.Tokens.Operators
 {
     public class ExcessiveDotToken : Token
     {
