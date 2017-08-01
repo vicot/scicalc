@@ -37,7 +37,7 @@ namespace SciCalc
     /// <summary>
     ///     Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         private readonly ObservableCollection<Constant> constants = new ObservableCollection<Constant>();
         private readonly ObservableCollection<HistoryEntry> history = new ObservableCollection<HistoryEntry>();
@@ -60,16 +60,29 @@ namespace SciCalc
             };
         }
 
+        /// <summary>
+        /// Gets the combined expression from all runs as a string.
+        /// </summary>
+        /// <value>
+        /// The expression.
+        /// </value>
         private string Expression => this.ExpressionParagraph != null
             ? new TextRange(this.ExpressionParagraph.ContentStart, this.ExpressionParagraph.ContentEnd).Text
             : "";
 
+        /// <summary>
+        /// Save the expression and it's result in history
+        /// </summary>
+        /// <param name="result">The result.</param>
         private void SaveHistory(double result)
         {
             this.parser.SetConstant("ANS", result);
             this.history.Add(new HistoryEntry(this.Expression, result));
         }
 
+        /// <summary>
+        /// Solves the expression using Parser class, saves and displays the result.
+        /// </summary>
         private void SolveExpression()
         {
             try
@@ -92,6 +105,9 @@ namespace SciCalc
             }
         }
 
+        /// <summary>
+        /// Clears the selection in expression box.
+        /// </summary>
         private void ClearSelection()
         {
             if (this.caretSelection.Text.Length > 0)
@@ -100,149 +116,9 @@ namespace SciCalc
             }
         }
 
-        private void ProcessKeyInput(string keys)
-        {
-            foreach (char key in keys)
-            {
-                this.ProcessKeyInput(key);
-            }
-        }
-
-        private void ProcessKeyInput(char key)
-        {
-            if (this.caretPointer == null)
-            {
-                this.caretPointer = this.ExpressionParagraph.ContentStart;
-            }
-            var range = new TextRange(this.caretSelection.Start, this.caretSelection.End);
-
-            //special keys
-            if (char.IsControl(key))
-            {
-                switch ((int) key)
-                {
-                    case 8: //backspace
-                    {
-                        if (range.IsEmpty)
-                        {
-                            TextPointer previousPosition =
-                                this.caretSelection.End.GetNextInsertionPosition(LogicalDirection.Backward);
-                            if (previousPosition != null)
-                            {
-                                range = new TextRange(previousPosition, this.caretSelection.End);
-
-                                //when deleting space, delete the character before it
-                                if (range.Text == " ")
-                                {
-                                    previousPosition =
-                                        previousPosition.GetNextInsertionPosition(LogicalDirection.Backward);
-                                    if (previousPosition != null)
-                                    {
-                                        range = new TextRange(previousPosition, this.caretSelection.End);
-                                    }
-                                }
-                            }
-                        }
-
-                        //add space before the range if needed
-
-                        string charactersbefore =
-                            range.Start.GetNextInsertionPosition(LogicalDirection.Backward)?
-                                .GetTextInRun(LogicalDirection.Forward) ?? "";
-                        if (charactersbefore.Length > 0 && charactersbefore[0] == ' ')
-                        {
-                            range = new TextRange(range.Start.GetNextInsertionPosition(LogicalDirection.Backward),
-                                                  range.End);
-                        }
-
-                        //nothing to remove, cancel operation
-                        if (range.Text.Length == 0)
-                        {
-                            return;
-                        }
-
-
-                        range.Text = "";
-                        break;
-                    }
-
-                    case 9: //delete
-                    {
-                        if (range.IsEmpty)
-                        {
-                            TextPointer nextPosition =
-                                this.caretSelection.End.GetNextInsertionPosition(LogicalDirection.Forward);
-                            if (nextPosition != null)
-                            {
-                                range = new TextRange(this.caretSelection.End, nextPosition);
-
-                                //when deleting space, delete the character after it
-                                if (range.Text == " ")
-                                {
-                                    nextPosition =
-                                        nextPosition.GetNextInsertionPosition(LogicalDirection.Forward);
-                                    if (nextPosition != null)
-                                    {
-                                        range = new TextRange(this.caretSelection.End, nextPosition);
-                                    }
-                                }
-                            }
-                        }
-
-                        //add space after the range if needed
-
-                        string charactersafter =
-                            range.End.GetNextInsertionPosition(LogicalDirection.Forward)?
-                                .GetTextInRun(LogicalDirection.Backward) ?? "";
-                        if (charactersafter.Length > 0 && charactersafter.Last() == ' ')
-                        {
-                            range = new TextRange(range.Start, range.End.GetNextInsertionPosition(LogicalDirection.Forward));
-                        }
-
-                        //nothing to remove, cancel operation
-                        if (range.Text.Length == 0)
-                        {
-                            return;
-                        }
-
-
-                        range.Text = "";
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                switch (key)
-                {
-                    case '(': //add closing )
-                        range.Text = "()";
-                        break;
-
-                    case ')': // ) are autogenerated, skip if was writing next ) just before an existing )
-                    {
-                        string expr = this.Expression;
-                        int offset = this.caretOffset;
-                        if (offset >= expr.Length || expr[offset] != ')' &&
-                            (expr.Length <= offset || expr[offset] != ' ' ||
-                             expr[offset + 1] != ')'))
-                        {
-                            range.Text = ")";
-                        }
-
-                        break;
-                    }
-
-                    default:
-                        range.Text = key.ToString();
-                        break;
-                }
-            }
-
-
-            this.ReformatExpression(key);
-        }
-
+        /// <summary>
+        /// Loads the history entry into expression and result boxes.
+        /// </summary>
         private void LoadHistoryEntry()
         {
             var entry = this.HistoryListBox.SelectedItem as HistoryEntry;
@@ -262,6 +138,10 @@ namespace SciCalc
             this.ReformatExpression();
         }
 
+        /// <summary>
+        /// Formats the expression by parsing it into tokens and generating a series of TokenRuns based on them
+        /// </summary>
+        /// <param name="addedCharacter">The added character.</param>
         private void ReformatExpression(char addedCharacter = (char) 0)
         {
             List<Token> tokens = this.parser.ParseTokens(this.Expression);
@@ -356,6 +236,10 @@ namespace SciCalc
             this.oldExpression = expression;
         }
 
+        /// <summary>
+        /// Sets the caret position in expression box.
+        /// </summary>
+        /// <param name="offset">The offset.</param>
         private void SetCursorPosition(int offset)
         {
             TextPointer tp = this.ExpressionParagraph.ContentStart;
@@ -376,11 +260,23 @@ namespace SciCalc
             this.ExpressionRichBox.CaretPosition = tp;
         }
 
+        /// <summary>
+        /// Handles the Click event of the SolveButton control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void SolveButton_Click(object sender, RoutedEventArgs e)
         {
             this.SolveExpression();
         }
 
+        /// <summary>
+        /// Handles the Loaded event of the Window control.
+        /// Link constant and history list sources.
+        /// Start timer for blinking caret display.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.ExpressionRichBox.CaretPosition = this.ExpressionParagraph.ContentStart;
@@ -405,158 +301,12 @@ namespace SciCalc
             timer.Start();
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-            // e.Handled will be set back to false if no special keys are captured here in this function
-            e.Handled = true;
-
-            //handle C-v and C-c keys for paste/copy
-            if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
-            {
-                switch (e.Key)
-                {
-                    case Key.V:
-                        this.ProcessKeyInput(Clipboard.GetText(TextDataFormat.Text));
-                        return;
-
-                    case Key.C:
-                        if (this.caretSelection.Text.Length > 0)
-                        {
-                            Clipboard.SetText(this.caretSelection.Text, TextDataFormat.Text);
-                        }
-                        else
-                        {
-                            Clipboard.SetText(this.ResultsBox.Text, TextDataFormat.Text);
-                        }
-                        return;
-
-                    case Key.R:
-                        this.ProcessKeyInput('√');
-                        return;
-
-                    case Key.Space:
-                        this.LoadHistoryEntry();
-                        return;
-                }
-            }
-            else
-            {
-                switch (e.Key)
-                {
-                    case Key.Escape:
-                        this.ExpressionParagraph.Inlines.Clear();
-                        this.ResultsBox.Text = "";
-                        this.SetCursorPosition(0);
-                        return;
-
-                    case Key.Back:
-                        this.ProcessKeyInput((char) 8);
-                        return;
-
-                    case Key.Delete:
-                        this.ProcessKeyInput((char) 9);
-                        return;
-
-                    case Key.Enter:
-                        this.SolveExpression();
-                        return;
-
-                    case Key.Home:
-                        this.ClearSelection();
-                        this.SetCursorPosition(0);
-                        return;
-
-                    case Key.End:
-                        this.ClearSelection();
-                        //go as far as possible
-                        this.SetCursorPosition(int.MaxValue - 1);
-                        return;
-
-                    case Key.Left:
-                        this.ClearSelection();
-                        this.SetCursorPosition(this.caretOffset - 1);
-                        return;
-
-                    case Key.Right:
-                        this.ClearSelection();
-                        this.SetCursorPosition(this.caretOffset + 1);
-                        return;
-
-                    case Key.Up:
-                    {
-                        if (this.history.Count > 0)
-                        {
-                            int index = this.HistoryListBox.SelectedIndex - 1;
-                            if (index < 0)
-                            {
-                                index = 0;
-                            }
-                            this.HistoryListBox.SelectedIndex = index;
-                        }
-
-                        return;
-                    }
-
-                    case Key.Down:
-                    {
-                        if (this.history.Count > 0)
-                        {
-                            int index = this.HistoryListBox.SelectedIndex + 1;
-                            if (index >= this.history.Count)
-                            {
-                                index = this.history.Count - 1;
-                            }
-                            this.HistoryListBox.SelectedIndex = index;
-                        }
-
-                        return;
-                    }
-
-                    case Key.Space:
-                        //intercept and cancel space keypress
-                        return;
-                }
-            }
-
-
-            e.Handled = false;
-        }
-
-        private void Window_TextInput(object sender, TextCompositionEventArgs e)
-        {
-            bool shiftPressed = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
-
-            //normal keys
-            if (e.Text.Length == 1)
-            {
-                char key = e.Text[0];
-
-                //special case for upper and lowercase letters
-                if (char.IsLetter(key))
-                {
-                    if (shiftPressed)
-                    {
-                        key = char.ToUpperInvariant(key);
-                    }
-
-                    if (key == ',')
-                    {
-                        //replace comma with dot, for languages that use comma as floating point
-                        key = '.';
-                    }
-
-                    this.ProcessKeyInput(key);
-                    return;
-                }
-
-                //if not letter, process as-is
-                this.ProcessKeyInput(key);
-            }
-
-
-            e.Handled = true;
-        }
-
+        /// <summary>
+        /// Handles the SelectionChanged event of the expression's RichTextBox control.
+        /// Used to capture mouse input for the expression box and to calculate position for the custom caret
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void RichTextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
             var rtb = (RichTextBox) sender;
@@ -597,6 +347,12 @@ namespace SciCalc
             this.RightEllipsis.Visibility = rect.Right - scrollOffset - this.ExpressionScrollViewer.ActualWidth < 0 ? Visibility.Hidden : Visibility.Visible;
         }
 
+        /// <summary>
+        /// Handles the MouseDoubleClick event of the ConstantsListBox control.
+        /// Doubleclicking an entry will append it to the expression
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
         private void ConstantsListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             Constant c = this.ConstantsListBox.SelectedItem as Constant;
@@ -606,6 +362,12 @@ namespace SciCalc
             }
         }
 
+        /// <summary>
+        /// Handles the Click event of the AddValueButton control.
+        /// Spawns a prompt and adds registers new constant in the parser
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void AddValueButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new EditConstDialog {Owner = this};
@@ -621,6 +383,12 @@ namespace SciCalc
             }
         }
 
+        /// <summary>
+        /// Handles the Click event of the RemoveValueButton control.
+        /// Deregisters the selected constant from the parser
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void RemoveValueButton_Click(object sender, RoutedEventArgs e)
         {
             Constant c = this.ConstantsListBox.SelectedItem as Constant;
@@ -632,6 +400,12 @@ namespace SciCalc
             }
         }
 
+        /// <summary>
+        /// Handles the Click event of the UiButton control. Generic event for most of input buttons, 
+        /// uses DataContext property of the button as an input string
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void UiButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button)
@@ -640,12 +414,22 @@ namespace SciCalc
             }
         }
 
+        /// <summary>
+        /// Handles the Click event of the DelButton control. Special button that simulates backspace key
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void DelButton_Click(object sender, RoutedEventArgs e)
         {
             //press backspace key
             this.ProcessKeyInput((char) 8);
         }
 
+        /// <summary>
+        /// Handles the Click event of the AcButton control. Special button that clears expression and result
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void AcButton_Click(object sender, RoutedEventArgs e)
         {
             this.ExpressionParagraph.Inlines.Clear();
@@ -653,6 +437,11 @@ namespace SciCalc
             this.parser.UnsetConstant("ANS");
         }
 
+        /// <summary>
+        /// Handles the Click event of the MenuItemEdit control. Spawns a dialog to edit selected constant
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void MenuItemEdit_Click(object sender, RoutedEventArgs e)
         {
             Constant c = this.ConstantsListBox.SelectedItem as Constant;
@@ -674,17 +463,32 @@ namespace SciCalc
             }
         }
 
+        /// <summary>
+        /// Handles the Click event of the MenuItemLoad control. Loads selected history entry into expression and result boxes
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void MenuItemLoad_Click(object sender, RoutedEventArgs e)
         {
             this.LoadHistoryEntry();
         }
 
+        /// <summary>
+        /// Handles the Click event of the MenuItemRemove control. Removes selected entry from history
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void MenuItemRemove_Click(object sender, RoutedEventArgs e)
         {
             var entry = this.HistoryListBox.SelectedItem as HistoryEntry;
             this.history.Remove(entry);
         }
 
+        /// <summary>
+        /// Handles the Click event of the MenuItemClearHistory control. Removes all entries from history
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void MenuItemClearHistory_Click(object sender, RoutedEventArgs e)
         {
             this.history.Clear();

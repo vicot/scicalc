@@ -45,6 +45,11 @@ namespace SciCalc
 
         public Dictionary<string, double> Constants { get; }
 
+        /// <summary>
+        /// Tokenize the expression into list of Tokens
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns>List of Tokens</returns>
         public List<Token> ParseTokens(string expression)
         {
             var state = ParseState.None;
@@ -196,6 +201,14 @@ namespace SciCalc
             return tokenList;
         }
 
+        /// <summary>
+        /// Parses the string into a proper Token based on current parser state.
+        /// </summary>
+        /// <param name="expression">The whole expression.</param>
+        /// <param name="state">The current parser state.</param>
+        /// <param name="startPosition">The position where the token starts in the expression.</param>
+        /// <param name="endPosition">The position where the token ends.</param>
+        /// <returns>Parsed Token</returns>
         private Token ParseLongToken(string expression, ParseState state, int startPosition, int endPosition)
         {
             string tokenstring = expression.Substring(startPosition, endPosition - startPosition);
@@ -219,6 +232,10 @@ namespace SciCalc
             return null;
         }
 
+        /// <summary>
+        /// Verifies the tokens. Marks them as invalid if they are paired with something unexpected (such as two operators next to each other)
+        /// </summary>
+        /// <param name="tokens">The tokens.</param>
         private void VerifyTokens(List<Token> tokens)
         {
             if (tokens.Count == 0)
@@ -249,6 +266,55 @@ namespace SciCalc
             }
         }
 
+        /// <summary>
+        /// Inserts the missing multiplication operators in the token list. 
+        /// </summary>
+        /// <param name="tokens">The tokens.</param>
+        /// <returns>List of Tokens with added MulOperators</returns>
+        private List<Token> InsertMissingTokens(List<Token> tokens)
+        {
+            //we will clone the original list and insert missing * operators between some tokens
+            var newTokens = new List<Token>();
+
+            for (var i = 0; i < tokens.Count - 1; ++i)
+            {
+                newTokens.Add(tokens[i]);
+
+                /* add multiplication between:
+                 * - values (and constants)
+                 * - values and functions
+                 * - values and parenthesis
+                 * - closing and opening parenthesis
+                 * - left-bound unary operators and opening parenthesis
+                 * - closing parenthesis and values, functions or right-bound unary operators
+                 * 
+                 * don't add multiplication for logartihm case: log2(...)
+                 */
+                if (
+                    tokens[i].TokenType == TokenType.Value && tokens[i + 1].TokenType == TokenType.Value ||
+                    tokens[i].TokenType == TokenType.Value && tokens[i + 1].TokenType == TokenType.Function ||
+                    tokens[i].TokenType == TokenType.Value && tokens[i + 1] is ParentOperator && (i == 0 || !(tokens[i - 1] is LogFunction)) ||
+                    tokens[i] is PercentOperator && tokens[i + 1] is ParentOperator ||
+                    tokens[i] is FactorialOperator && tokens[i + 1] is ParentOperator ||
+                    tokens[i] is CloseParentOperator && tokens[i + 1].TokenType == TokenType.Value ||
+                    tokens[i] is CloseParentOperator && tokens[i + 1].TokenType == TokenType.Function ||
+                    tokens[i] is CloseParentOperator && tokens[i + 1] is ParentOperator)
+                {
+                    newTokens.Add(new MulOperator());
+                }
+            }
+
+            //add the last token that was ommited in the loop
+            newTokens.Add(tokens.Last());
+
+            return newTokens;
+        }
+
+        /// <summary>
+        /// Converts the infix expression into postfix notation (RPN)
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <exception cref="ParseException"></exception>
         public void LoadToPostfix(string expression)
         {
             List<Token> tokens = this.ParseTokens(expression);
@@ -338,45 +404,11 @@ namespace SciCalc
             }
         }
 
-        private List<Token> InsertMissingTokens(List<Token> tokens)
-        {
-            //we will clone the original list and insert missing * operators between some tokens
-            var newTokens = new List<Token>();
-
-            for (var i = 0; i < tokens.Count - 1; ++i)
-            {
-                newTokens.Add(tokens[i]);
-
-                /* add multiplication between:
-                 * - values (and constants)
-                 * - values and functions
-                 * - values and parenthesis
-                 * - closing and opening parenthesis
-                 * - left-bound unary operators and opening parenthesis
-                 * - closing parenthesis and values, functions or right-bound unary operators
-                 * 
-                 * don't add multiplication for logartihm case: log2(...)
-                 */
-                if (
-                    tokens[i].TokenType == TokenType.Value && tokens[i + 1].TokenType == TokenType.Value ||
-                    tokens[i].TokenType == TokenType.Value && tokens[i + 1].TokenType == TokenType.Function ||
-                    tokens[i].TokenType == TokenType.Value && tokens[i + 1] is ParentOperator && (i == 0 || !(tokens[i - 1] is LogFunction)) ||
-                    tokens[i] is PercentOperator && tokens[i + 1] is ParentOperator ||
-                    tokens[i] is FactorialOperator && tokens[i + 1] is ParentOperator ||
-                    tokens[i] is CloseParentOperator && tokens[i + 1].TokenType == TokenType.Value ||
-                    tokens[i] is CloseParentOperator && tokens[i + 1].TokenType == TokenType.Function ||
-                    tokens[i] is CloseParentOperator && tokens[i + 1] is ParentOperator)
-                {
-                    newTokens.Add(new MulOperator());
-                }
-            }
-
-            //add the last token that was ommited in the loop
-            newTokens.Add(tokens.Last());
-
-            return newTokens;
-        }
-
+        /// <summary>
+        /// Solve the postfix expression that was loaded with LoadToPostfix method
+        /// </summary>
+        /// <returns>Result of the equation</returns>
+        /// <exception cref="ParseException">Invalid expression.</exception>
         public double Solve()
         {
             var results = new Stack<double>();
@@ -412,16 +444,29 @@ namespace SciCalc
             return results.Pop();
         }
 
+        /// <summary>
+        /// Sets a constant that can be used in the expression.
+        /// </summary>
+        /// <param name="name">The constant's name.</param>
+        /// <param name="value">The constant's value.</param>
         public void SetConstant(string name, double value)
         {
             this.Constants[name] = value;
         }
 
+        /// <summary>
+        /// Removes a constant from allowed constants in the expression
+        /// </summary>
+        /// <param name="name">The constant's name.</param>
+        /// <returns>False if constant wasn't set, True otherwise</returns>
         public bool UnsetConstant(string name)
         {
             return this.Constants.Remove(name);
         }
 
+        /// <summary>
+        /// Internal states used during tokenization of string input
+        /// </summary>
         private enum ParseState
         {
             None,

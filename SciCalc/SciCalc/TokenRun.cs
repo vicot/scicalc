@@ -25,6 +25,10 @@ using SciCalc.Tokens;
 
 namespace SciCalc
 {
+    /// <summary>
+    /// Custom Run class that formats itself based on the token
+    /// </summary>
+    /// <seealso cref="System.Windows.Documents.Run" />
     public class TokenRun : Run
     {
         private readonly Token token;
@@ -33,16 +37,25 @@ namespace SciCalc
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TokenRun"/> class.
+        /// </summary>
+        /// <param name="text">A string specifying the initial contents of the <see cref="T:System.Windows.Documents.Run" /> object.</param>
         public TokenRun(string text) : base(text)
         {
             this.token = new EmptyToken();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TokenRun"/> class.
+        /// Sets a color depending on token's type and validity
+        /// </summary>
+        /// <param name="token">The token.</param>
         public TokenRun(Token token) : this(token.Symbol)
         {
             this.token = token;
 
-            //set color
+            //set the color
             if (!token.IsValid)
             {
                 this.Foreground = Brushes.Red;
@@ -64,17 +77,24 @@ namespace SciCalc
                         break;
                 }
 
-                //if (token.Inferred)
-                //{
-                //    this.Foreground = Brushes.Gray;
-                //}
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TokenRun"/> class. Required by interface
+        /// </summary>
+        /// <param name="text">A string specifying the initial contents of the <see cref="T:System.Windows.Documents.Run" /> object.</param>
+        /// <param name="insertionPosition">A <see cref="T:System.Windows.Documents.TextPointer" /> specifying an insertion position at which to insert the text run after it is created, or null for no automatic insertion.</param>
         public TokenRun(string text, TextPointer insertionPosition) : base(text, insertionPosition)
         {
         }
 
+        /// <summary>
+        /// Creates a new <see cref="TokenRun"/> based on the nextToken parameter. Inserts a space between them if needed.
+        /// This method is used to create a formatted chain of Tokens.
+        /// </summary>
+        /// <param name="nextToken">The next token.</param>
+        /// <returns></returns>
         public List<TokenRun> ConnectToken(Token nextToken)
         {
             var runs = new List<TokenRun>(3);

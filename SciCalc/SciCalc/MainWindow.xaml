@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:sciCalc="clr-namespace:SciCalc"
         mc:Ignorable="d"
-        Title="SciCalc" SizeToContent="Height" Width="500" Background="DarkGray" PreviewKeyDown="Window_KeyDown"
-        PreviewTextInput="Window_TextInput" Loaded="Window_Loaded">
+        Title="SciCalc" SizeToContent="Height" Width="500" Background="DarkGray" PreviewKeyDown="Window_PreviewKeyDown"
+        PreviewTextInput="Window_PreviewTextInput" Loaded="Window_Loaded">
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />
