@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 using SciCalc.Tokens.Operators;
 using SciCalc.Tokens.Values;
 
@@ -8,6 +9,8 @@ namespace SciCalc.Tests
     [TestFixture]
     public class TokenTests
     {
+        private Parser parser;
+
         [Test]
         public void TokenBindings()
         {
@@ -29,367 +32,184 @@ namespace SciCalc.Tests
         }
 
 
-        [Test]
-        public void Constants()
+        [OneTimeSetUp]
+        public void Setup()
         {
-            var parser = new Parser();
-            parser.SetConstant("X", 8);
-            parser.LoadToPostfix("X+3-X");
-            double result = parser.Solve();
-            double expected = 3;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.SetConstant("Y", 3);
-            parser.LoadToPostfix("2*X-Y");
-            result = parser.Solve();
-            expected = 13;
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser = new Parser();
         }
 
-        [Test]
-        public void FunctionCos()
+        [TestCase("X+3-X", ExpectedResult = 3)]
+        [TestCase("2*X-Y", ExpectedResult = 13)]
+        public double Constants(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("cos(17)");
-            double result = parser.Solve();
-            double expected = Math.Cos(17);
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.SetConstant("X", 8);
+            this.parser.SetConstant("Y", 3);
 
-            parser.LoadToPostfix("cos(PI/2)");
-            result = parser.Solve();
-            expected = Math.Cos(Math.PI / 2);
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
         }
 
-        [Test]
-        public void FunctionCtg()
+        [TestCase("sin(0)", ExpectedResult = 0)]
+        [TestCase("sin(PI/2)", ExpectedResult = 1)]
+        [TestCase("sin(PI/6)", ExpectedResult = 0.5)]
+        public double FunctionSin(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("ctg(17)");
-            double result = parser.Solve();
-            double expected = 1 / Math.Tan(17);
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("ctg(PI/2)");
-            result = parser.Solve();
-            expected = 1 / Math.Tan(Math.PI / 2);
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return (float)this.parser.Solve();
         }
 
-        [Test]
-        public void FunctionLn()
+        [TestCase("cos(0)", ExpectedResult = 1)]
+        [TestCase("cos(1_3PI)", ExpectedResult = 0.5)]
+        public double FunctionCos(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("ln(7)");
-            double result = parser.Solve();
-            double expected = Math.Log(7);
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("ln(E^2)");
-            result = parser.Solve();
-            expected = 2;
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return (float)this.parser.Solve();
         }
 
-        [Test]
-        public void FunctionLog()
+        [TestCase("tan(0)", ExpectedResult = 0)]
+        [TestCase("tan(PI/4)", ExpectedResult = 1)]
+        public double FunctionTan(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("log2(8)");
-            double result = parser.Solve();
-            double expected = 3;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("log10(100)");
-            result = parser.Solve();
-            expected = 2;
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return (float)this.parser.Solve();
         }
 
-        [Test]
-        public void FunctionSin()
+        [TestCase("ctg(PI/4)", ExpectedResult = 1)]
+        public double FunctionCtg(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("sin(17)");
-            double result = parser.Solve();
-            double expected = Math.Sin(17);
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("sin(PI/2)");
-            result = parser.Solve();
-            expected = Math.Sin(Math.PI / 2);
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("sin(1_2 * PI)");
-            result = parser.Solve();
-            expected = Math.Sin(Math.PI / 2);
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return (float)this.parser.Solve();
         }
 
-        [Test]
-        public void FunctionTan()
+        [TestCase("ln(1)", ExpectedResult = 0)]
+        [TestCase("ln(E^2)", ExpectedResult = 2)]
+        public double FunctionLn(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("tan(17)");
-            double result = parser.Solve();
-            double expected = Math.Tan(17);
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("tan(PI/2)");
-            result = parser.Solve();
-            expected = Math.Tan(Math.PI / 2);
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
         }
 
-        [Test]
-        public void OperatorDiv()
+        [TestCase("log2(8)", ExpectedResult = 3)]
+        [TestCase("log10(100)", ExpectedResult = 2)]
+        public double FunctionLog(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("7/2");
-            double result = parser.Solve();
-            var expected = 3.5;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("2.3/4.2");
-            result = parser.Solve();
-            expected = 2.3 / 4.2;
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
         }
 
-        [Test]
-        public void OperatorFactorial()
+        [TestCase("2+2", ExpectedResult = 4)]
+        [TestCase("2.3+2", ExpectedResult = 4.3)]
+        public double OperatorSum(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("5!");
-            double result = parser.Solve();
-            double expected = 120;
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
         }
 
-        [Test]
-        public void OperatorFraction()
+        [TestCase("4-1", ExpectedResult = 3)]
+        [TestCase("7.34-2.12", ExpectedResult = 5.22)]
+        [TestCase("1-1+2", ExpectedResult = 2)]
+        public double OperatorSub(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("5_2");
-            double result = parser.Solve();
-            var expected = 2.5;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("1_2/3_4");
-            result = parser.Solve();
-            expected = 2.0 / 3.0;
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
         }
 
-        [Test]
-        public void OperatorModulo()
+        [TestCase("2*3", ExpectedResult = 6)]
+        [TestCase("2.5*3", ExpectedResult = 7.5)]
+        public double OperatorMul(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("5 # 2");
-            double result = parser.Solve();
-            double expected = 1;
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
         }
 
-        [Test]
-        public void OperatorMul()
+        [TestCase("7/2", ExpectedResult = 3.5)]
+        [TestCase("2.3/4.2", ExpectedResult = 2.3/4.2)]
+        public double OperatorDiv(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("2*3");
-            double result = parser.Solve();
-            double expected = 6;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("2.5*3");
-            result = parser.Solve();
-            expected = 7.5;
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
         }
 
-        [Test]
-        public void OperatorNegate()
+        [TestCase("-3", ExpectedResult = -3)]
+        [TestCase("7+-3", ExpectedResult = 4)]
+        [TestCase("(3+3)-3", ExpectedResult = 3)]
+        public double OperatorNegate(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("-3");
-            double result = parser.Solve();
-            double expected = -3;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("7+-3");
-            result = parser.Solve();
-            expected = 4;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("(3+3)-3");
-            result = parser.Solve();
-            expected = 3;
-            Assert.That(result, Is.EqualTo(expected), "(3+3)-3, minus is a binary operator here");
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
         }
 
-        [Test]
-        public void OperatorParenthesis()
+        [TestCase("5_2", ExpectedResult = 2.5)]
+        [TestCase("1_2/3_4", ExpectedResult = 2.0/3.0)]
+        public double OperatorFraction(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("(5)");
-            double result = parser.Solve();
-            double expected = 5;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("(((5)))");
-            result = parser.Solve();
-            expected = 5;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("(5*(1+(2-1)))");
-            result = parser.Solve();
-            expected = 10;
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
         }
 
-        [Test]
-        public void OperatorPercent()
+        [TestCase("5#2", ExpectedResult = 1)]
+        public double OperatorModulo(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("7%");
-            double result = parser.Solve();
-            var expected = 0.07;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("10+30%");
-            result = parser.Solve();
-            expected = 10.3;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("5+5+30%");
-            result = parser.Solve();
-            expected = 10.3;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("5+5+30%+5");
-            result = parser.Solve();
-            expected = 15.3;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("5*50%");
-            result = parser.Solve();
-            expected = 2.5;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("3+5*200%");
-            result = parser.Solve();
-            expected = 13;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("10-30%");
-            result = parser.Solve();
-            expected = 9.7;
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
         }
 
-        [Test]
-        public void OperatorPower()
+        [TestCase("(5)", ExpectedResult = 5)]
+        [TestCase("(((5)))", ExpectedResult = 5)]
+        [TestCase("(5*(1+(2-1)))", ExpectedResult = 10)]
+        public double OperatorParenthesis(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("2^3");
-            double result = parser.Solve();
-            double expected = 8;
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
         }
 
-        [Test]
-        public void OperatorPriority()
+        [TestCase("7%", ExpectedResult = 0.07)]
+        [TestCase("10+30%", ExpectedResult = 10.3)]
+        [TestCase("5+5+30%", ExpectedResult = 10.3)]
+        [TestCase("5+5+30%+5", ExpectedResult = 15.3)]
+        [TestCase("5*50%", ExpectedResult = 2.5)]
+        [TestCase("3+5*200%", ExpectedResult = 13)]
+        [TestCase("10-30%", ExpectedResult = 9.7)]
+        public double OperatorPercent(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("2+2*2");
-            double result = parser.Solve();
-            double expected = 6;
-            Assert.That(result, Is.EqualTo(expected), "sum before mul");
-
-            parser.LoadToPostfix("2*(2+2)");
-            result = parser.Solve();
-            expected = 8;
-            Assert.That(result, Is.EqualTo(expected), "parenthesis ignored");
-
-            parser.LoadToPostfix("2*3^2");
-            result = parser.Solve();
-            expected = 18;
-            Assert.That(result, Is.EqualTo(expected), "mul before power");
-
-            parser.LoadToPostfix("3+2+50%+5");
-            result = parser.Solve();
-            expected = 10.5;
-            Assert.That(result, Is.EqualTo(expected), "percent should only affect the 50");
-
-            parser.LoadToPostfix("√4+5");
-            result = parser.Solve();
-            expected = 7;
-            Assert.That(result, Is.EqualTo(expected), "sum before root");
-
-            parser.LoadToPostfix("3+7*log3(7+2)-8");
-            result = parser.Solve();
-            expected = 9;
-            Assert.That(result, Is.EqualTo(expected), "");
-
-            parser.LoadToPostfix("sin(1-1+1_2*PI)");
-            result = parser.Solve();
-            expected = 1;
-            Assert.That(result, Is.EqualTo(expected), "fraction > mul > sum and sub");
-
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
         }
 
-        [Test]
-        public void OperatorRoot()
+        [TestCase("2^3", ExpectedResult = 8)]
+        public double OperatorPower(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("√2");
-            double result = parser.Solve();
-            double expected = Math.Sqrt(2);
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("3√27");
-            result = parser.Solve();
-            expected = 3;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("3√(3*3*3)");
-            result = parser.Solve();
-            expected = 3;
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
         }
 
-        [Test]
-        public void OperatorSub()
+        [TestCase("√4", ExpectedResult = 2)]
+        [TestCase("3√27", ExpectedResult = 3)]
+        [TestCase("3√(3*3*3)", ExpectedResult = 3)]
+        public double OperatorRoot(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("4-1");
-            double result = parser.Solve();
-            double expected = 3;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("7.34-2.12");
-            result = parser.Solve();
-            expected = 5.22;
-            Assert.That(result, Is.EqualTo(expected));
-
-            parser.LoadToPostfix("1-1+2");
-            result = parser.Solve();
-            expected = 2;
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
         }
 
-        [Test]
-        public void OperatorSum()
+        [TestCase("5!", ExpectedResult = 120)]
+        public double OperatorFactorial(string expr)
         {
-            var parser = new Parser();
-            parser.LoadToPostfix("2+2");
-            double result = parser.Solve();
-            double expected = 4;
-            Assert.That(result, Is.EqualTo(expected));
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
+        }
 
-            parser.LoadToPostfix("2.3+2");
-            result = parser.Solve();
-            expected = 4.3;
-            Assert.That(result, Is.EqualTo(expected));
+        [TestCase("2+2*2", ExpectedResult = 6)]
+        [TestCase("2*(2+2)", ExpectedResult = 8)]
+        [TestCase("2*3^2", ExpectedResult = 18)]
+        [TestCase("3+2+50%+5", ExpectedResult = 10.5)]
+        [TestCase("√4+5", ExpectedResult = 7)]
+        [TestCase("3+7*log3(7+2)-8", ExpectedResult = 9)]
+        [TestCase("sin(1-1+1_2*PI)", ExpectedResult = 1)]
+        public double OperatorPriority(string expr)
+        {
+            this.parser.LoadToPostfix(expr);
+            return this.parser.Solve();
         }
     }
 }
