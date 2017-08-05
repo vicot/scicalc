@@ -28,6 +28,11 @@ namespace SciCalc.Tokens.Values
 {
     public abstract class Value : Token
     {
+        public int InsignificantZeros
+        {
+            set => this.Symbol+=new string('0', value);
+        }
+
         protected Value(double value) : base(value.ToString(CultureInfo.InvariantCulture))
         {
             this.Priority = 0;

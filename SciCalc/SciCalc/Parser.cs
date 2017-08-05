@@ -218,7 +218,12 @@ namespace SciCalc
                     return new IntegerValue(long.Parse(tokenstring));
 
                 case ParseState.ValueDouble:
-                    return new DoubleValue(double.Parse(tokenstring, NumberStyles.Any, CultureInfo.InvariantCulture));
+                    {
+                        Value token = new DoubleValue(double.Parse(tokenstring, NumberStyles.Any, CultureInfo.InvariantCulture));
+                        token.InsignificantZeros = tokenstring.Length - tokenstring.LastIndexOfAny(new[] {'.', '1', '2', '3', '4', '5', '6', '7', '8', '9'}) - 1;
+
+                        return token;
+                    }
 
                 case ParseState.Constant:
                     return this.Constants.ContainsKey(tokenstring)
