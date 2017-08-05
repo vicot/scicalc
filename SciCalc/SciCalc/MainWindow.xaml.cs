@@ -61,17 +61,17 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Gets the combined expression from all runs as a string.
+        ///     Gets the combined expression from all runs as a string.
         /// </summary>
         /// <value>
-        /// The expression.
+        ///     The expression.
         /// </value>
         private string Expression => this.ExpressionParagraph != null
             ? new TextRange(this.ExpressionParagraph.ContentStart, this.ExpressionParagraph.ContentEnd).Text
             : "";
 
         /// <summary>
-        /// Save the expression and it's result in history
+        ///     Save the expression and it's result in history
         /// </summary>
         /// <param name="result">The result.</param>
         private void SaveHistory(double result)
@@ -81,7 +81,7 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Solves the expression using Parser class, saves and displays the result.
+        ///     Solves the expression using Parser class, saves and displays the result.
         /// </summary>
         private void SolveExpression()
         {
@@ -107,7 +107,7 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Clears the selection in expression box.
+        ///     Clears the selection in expression box.
         /// </summary>
         private void ClearSelection()
         {
@@ -118,7 +118,7 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Loads the history entry into expression and result boxes.
+        ///     Loads the history entry into expression and result boxes.
         /// </summary>
         private void LoadHistoryEntry()
         {
@@ -140,7 +140,7 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Formats the expression by parsing it into tokens and generating a series of TokenRuns based on them
+        ///     Formats the expression by parsing it into tokens and generating a series of TokenRuns based on them
         /// </summary>
         /// <param name="addedCharacter">The added character.</param>
         private void ReformatExpression(char addedCharacter = (char) 0)
@@ -238,7 +238,7 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Sets the caret position in expression box.
+        ///     Sets the caret position in expression box.
         /// </summary>
         /// <param name="offset">The offset.</param>
         private void SetCursorPosition(int offset)
@@ -262,22 +262,22 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Handles the Click event of the SolveButton control.
+        ///     Handles the Click event of the SolveButton control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void SolveButton_Click(object sender, RoutedEventArgs e)
         {
             this.SolveExpression();
         }
 
         /// <summary>
-        /// Handles the Loaded event of the Window control.
-        /// Link constant and history list sources.
-        /// Start timer for blinking caret display.
+        ///     Handles the Loaded event of the Window control.
+        ///     Link constant and history list sources.
+        ///     Start timer for blinking caret display.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.ExpressionRichBox.CaretPosition = this.ExpressionParagraph.ContentStart;
@@ -303,11 +303,11 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Handles the SelectionChanged event of the expression's RichTextBox control.
-        /// Used to capture mouse input for the expression box and to calculate position for the custom caret
+        ///     Handles the SelectionChanged event of the expression's RichTextBox control.
+        ///     Used to capture mouse input for the expression box and to calculate position for the custom caret
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void RichTextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
             var rtb = (RichTextBox) sender;
@@ -349,11 +349,11 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Handles the MouseDoubleClick event of the ConstantsListBox control.
-        /// Doubleclicking an entry will append it to the expression
+        ///     Handles the MouseDoubleClick event of the ConstantsListBox control.
+        ///     Doubleclicking an entry will append it to the expression
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="MouseButtonEventArgs" /> instance containing the event data.</param>
         private void ConstantsListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             //Constant c = this.ConstantsListBox.SelectedItem as Constant;
@@ -364,11 +364,11 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Handles the Click event of the AddValueButton control.
-        /// Spawns a prompt and adds registers new constant in the parser
+        ///     Handles the Click event of the AddValueButton control.
+        ///     Spawns a prompt and adds registers new constant in the parser
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void AddValueButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new EditConstDialog {Owner = this};
@@ -385,11 +385,11 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Handles the Click event of the RemoveValueButton control.
-        /// Deregisters the selected constant from the parser
+        ///     Handles the Click event of the RemoveValueButton control.
+        ///     Deregisters the selected constant from the parser
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void RemoveValueButton_Click(object sender, RoutedEventArgs e)
         {
             if (this.ConstantsListBox.SelectedItem is Constant c)
@@ -401,11 +401,11 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Handles the Click event of the UiButton control. Generic event for most of input buttons, 
-        /// uses DataContext property of the button as an input string
+        ///     Handles the Click event of the UiButton control. Generic event for most of input buttons,
+        ///     uses DataContext property of the button as an input string
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void UiButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button)
@@ -415,10 +415,11 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Handles the MouseRightButtonDown event of the DivideButton control. Special case that inserts _ instead of / when right clicking on / button
+        ///     Handles the MouseRightButtonDown event of the DivideButton control. Special case that inserts _ instead of / when
+        ///     right clicking on / button
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="MouseButtonEventArgs" /> instance containing the event data.</param>
         /// <exception cref="System.NotImplementedException"></exception>
         private void DivideButton_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -426,10 +427,10 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Handles the Click event of the DelButton control. Special button that simulates backspace key
+        ///     Handles the Click event of the DelButton control. Special button that simulates backspace key
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void DelButton_Click(object sender, RoutedEventArgs e)
         {
             //press backspace key
@@ -437,10 +438,10 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Handles the Click event of the AcButton control. Special button that clears expression and result
+        ///     Handles the Click event of the AcButton control. Special button that clears expression and result
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void AcButton_Click(object sender, RoutedEventArgs e)
         {
             this.ExpressionParagraph.Inlines.Clear();
@@ -449,10 +450,10 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Handles the Click event of the MenuItemEdit control. Spawns a dialog to edit selected constant
+        ///     Handles the Click event of the MenuItemEdit control. Spawns a dialog to edit selected constant
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void MenuItemEdit_Click(object sender, RoutedEventArgs e)
         {
             if (this.ConstantsListBox.SelectedItem is Constant c)
@@ -474,20 +475,20 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Handles the Click event of the MenuItemLoad control. Loads selected history entry into expression and result boxes
+        ///     Handles the Click event of the MenuItemLoad control. Loads selected history entry into expression and result boxes
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void MenuItemLoad_Click(object sender, RoutedEventArgs e)
         {
             this.LoadHistoryEntry();
         }
 
         /// <summary>
-        /// Handles the Click event of the MenuItemRemove control. Removes selected entry from history
+        ///     Handles the Click event of the MenuItemRemove control. Removes selected entry from history
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void MenuItemRemove_Click(object sender, RoutedEventArgs e)
         {
             var entry = this.HistoryListBox.SelectedItem as HistoryEntry;
@@ -495,10 +496,10 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Handles the Click event of the MenuItemClearHistory control. Removes all entries from history
+        ///     Handles the Click event of the MenuItemClearHistory control. Removes all entries from history
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void MenuItemClearHistory_Click(object sender, RoutedEventArgs e)
         {
             this.history.Clear();

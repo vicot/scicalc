@@ -29,6 +29,7 @@ namespace SciCalc.Tokens
     {
         //by default, don't require any tokens on either side
         protected List<Type> leftBinding;
+
         protected List<Type> rightBinding;
 
         protected Token(string symbol)
@@ -52,18 +53,18 @@ namespace SciCalc.Tokens
 
         //by default all tokens are valid unless explicitly invalidated
         public bool IsValid { get; set; } = true;
-        
+
         /// <summary>The error message to display if token was invalidated.</summary>
         public virtual string ErrorMessage => $"Invalid token '{this.Symbol}'";
 
         //check if token type is assignable to any of the valid bindings, or check if can be empty (null binding && null token)
-       
+
         public bool IsLeftBound(Token token) => token is ExcessiveDotToken || this.leftBinding.Any(t => token == null && t == null || t != null && t.IsInstanceOfType(token));
-        
+
         public bool IsRightBound(Token token) => token is ExcessiveDotToken || this.rightBinding.Any(t => token == null && t == null || t != null && t.IsInstanceOfType(token));
 
         /// <summary>
-        /// Executes the token's function with single argument
+        ///     Executes the token's function with single argument
         /// </summary>
         /// <param name="arg">The argument.</param>
         /// <returns>Result of the operation</returns>
@@ -73,7 +74,7 @@ namespace SciCalc.Tokens
         }
 
         /// <summary>
-        /// Executes the token's function with two arguments
+        ///     Executes the token's function with two arguments
         /// </summary>
         /// <param name="arg1">The first argument.</param>
         /// <param name="arg2">The second argument.</param>
@@ -86,7 +87,7 @@ namespace SciCalc.Tokens
         #region equality
 
         /// <summary>
-        /// Compare this token with other one based on their types, values, symbols and argument count
+        ///     Compare this token with other one based on their types, values, symbols and argument count
         /// </summary>
         /// <param name="other">The other.</param>
         /// <returns><c>true</c> if the specified <see cref="Token" /> is equal to this instance; otherwise, <c>false</c>.</returns>
@@ -97,11 +98,11 @@ namespace SciCalc.Tokens
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="object" />, is equal to this instance.
+        ///     Determines whether the specified <see cref="object" />, is equal to this instance.
         /// </summary>
         /// <param name="obj">The <see cref="object" /> to compare with this instance.</param>
         /// <returns>
-        ///   <c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
         public override bool Equals(object obj)
         {
@@ -122,10 +123,10 @@ namespace SciCalc.Tokens
         }
 
         /// <summary>
-        /// Returns a hash code for this instance.
+        ///     Returns a hash code for this instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        ///     A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {

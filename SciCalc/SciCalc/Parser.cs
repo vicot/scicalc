@@ -46,7 +46,7 @@ namespace SciCalc
         public Dictionary<string, double> Constants { get; }
 
         /// <summary>
-        /// Tokenize the expression into list of Tokens
+        ///     Tokenize the expression into a list of Tokens
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <returns>List of Tokens</returns>
@@ -202,7 +202,7 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Parses the string into a proper Token based on current parser state.
+        ///     Parses the string into a proper Token based on current parser state.
         /// </summary>
         /// <param name="expression">The whole expression.</param>
         /// <param name="state">The current parser state.</param>
@@ -233,7 +233,8 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Verifies the tokens. Marks them as invalid if they are paired with something unexpected (such as two operators next to each other)
+        ///     Verifies the tokens. Marks them as invalid if they are paired with something unexpected (such as two operators next
+        ///     to each other)
         /// </summary>
         /// <param name="tokens">The tokens.</param>
         private void VerifyTokens(List<Token> tokens)
@@ -267,7 +268,7 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Inserts the missing multiplication operators in the token list. 
+        ///     Inserts the missing multiplication operators in the token list.
         /// </summary>
         /// <param name="tokens">The tokens.</param>
         /// <returns>List of Tokens with added MulOperators</returns>
@@ -311,7 +312,7 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Converts the infix expression into postfix notation (RPN)
+        ///     Converts the infix expression into postfix notation (RPN)
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <exception cref="ParseException"></exception>
@@ -405,7 +406,7 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Solve the postfix expression that was loaded with LoadToPostfix method
+        ///     Solve the postfix expression that was loaded with LoadToPostfix method
         /// </summary>
         /// <returns>Result of the equation</returns>
         /// <exception cref="ParseException">Invalid expression.</exception>
@@ -445,7 +446,7 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Sets a constant that can be used in the expression.
+        ///     Sets a constant that can be used in the expression.
         /// </summary>
         /// <param name="name">The constant's name.</param>
         /// <param name="value">The constant's value.</param>
@@ -455,7 +456,7 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Removes a constant from allowed constants in the expression
+        ///     Removes a constant from allowed constants in the expression
         /// </summary>
         /// <param name="name">The constant's name.</param>
         /// <returns>False if constant wasn't set, True otherwise</returns>
@@ -465,7 +466,7 @@ namespace SciCalc
         }
 
         /// <summary>
-        /// Internal states used during tokenization of string input
+        ///     Internal states used during tokenization of string input
         /// </summary>
         private enum ParseState
         {
