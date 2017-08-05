@@ -44,21 +44,20 @@ namespace SciCalc
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            if (double.TryParse(this.ValueBox.Text, out double result))
+            string valueString = this.ValueBox.Text.Replace(',', '.');
+            if (double.TryParse(valueString, NumberStyles.Any, CultureInfo.InvariantCulture, out double result))
             {
                 this.Value = result;
             }
             else
             {
-                MessageBox.Show($"'{this.ValueBox.Text}' is not a valid number.", "Error", MessageBoxButton.OK,
-                                MessageBoxImage.Error);
+                MessageBox.Show($"'{this.ValueBox.Text}' is not a valid number.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
             if (string.IsNullOrEmpty(this.NameBox.Text))
             {
-                MessageBox.Show($"Must provide name for the value", "Error", MessageBoxButton.OK,
-                                MessageBoxImage.Error);
+                MessageBox.Show($"Must provide name for the value", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 

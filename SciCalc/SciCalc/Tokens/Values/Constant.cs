@@ -58,9 +58,17 @@ namespace SciCalc.Tokens.Values
 
         public override string ErrorMessage => $"Undefined constant '{this.Symbol}'";
 
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance with the value rounded to 5 decimal places.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
         public override string ToString()
         {
-            return $"{this.Symbol} = {(float) this.Value}";
+            double shortval = Math.Round(this.Value, 5);
+            string ellipsis = shortval != this.Value ? "..." : "";
+            return $"{this.Symbol} = {shortval}{ellipsis}";
         }
     }
 }
