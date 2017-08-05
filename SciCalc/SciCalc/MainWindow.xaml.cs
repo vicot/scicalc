@@ -364,18 +364,22 @@ namespace SciCalc
         }
 
         /// <summary>
-        ///     Handles the Click event of the AddValueButton control.
+        ///     Handles the Click event of the AddConstantButton control.
         ///     Spawns a prompt and adds registers new constant in the parser
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
-        private void AddValueButton_Click(object sender, RoutedEventArgs e)
+        private void AddConstantButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new EditConstDialog {Owner = this};
             bool result = dialog.ShowDialog() ?? false;
             if (result)
             {
-                var c = new Constant(dialog.ValueName, dialog.Value);
+                //check if const existed before
+                Constant oldConst = this.constants.FirstOrDefault(t => t.Symbol == dialog.ValueName);
+                if (oldConst != null) this.constants.Remove(oldConst);
+                
+                Constant c = new Constant(dialog.ValueName, dialog.Value);
                 this.constants.Add(c);
 
                 this.parser.SetConstant(c.Symbol, c.Value);
@@ -385,12 +389,12 @@ namespace SciCalc
         }
 
         /// <summary>
-        ///     Handles the Click event of the RemoveValueButton control.
+        ///     Handles the Click event of the RemoveConstantButton control.
         ///     Deregisters the selected constant from the parser
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
-        private void RemoveValueButton_Click(object sender, RoutedEventArgs e)
+        private void RemoveConstantButton_Click(object sender, RoutedEventArgs e)
         {
             if (this.ConstantsListBox.SelectedItem is Constant c)
             {
