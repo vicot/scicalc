@@ -100,8 +100,9 @@ namespace SciCalc
             }
             catch (Exception ex)
             {
-                this.ResultsBox.Foreground = Brushes.DarkRed;
-                this.ResultsBox.Text = ex.Message;
+                //unknown exception
+                this.ResultsBox.Text = "";
+                MessageBox.Show($"Unknown error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -412,6 +413,17 @@ namespace SciCalc
             {
                 this.ProcessKeyInput(button.DataContext as string ?? "?");
             }
+        }
+
+        /// <summary>
+        /// Handles the MouseRightButtonDown event of the DivideButton control. Special case that inserts _ instead of / when right clicking on / button
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        private void DivideButton_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            this.ProcessKeyInput('_');
         }
 
         /// <summary>

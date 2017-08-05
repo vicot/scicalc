@@ -90,10 +90,10 @@
                 <Button Grid.Row="6" Grid.Column="2" Margin="1" Content="." Click="UiButton_Click" DataContext="." Padding="0" FontSize="15" />
 
 
-                <Button Grid.Row="4" Grid.Column="3" Margin="1" Content="*" Click="UiButton_Click" DataContext="*" Padding="0" FontSize="15" />
-                <Button Grid.Row="4" Grid.Column="4" Margin="1" Content="/" Click="UiButton_Click" DataContext="/" Padding="0" FontSize="15" />
-                <Button Grid.Row="5" Grid.Column="3" Margin="1" Content="+" Click="UiButton_Click" DataContext="+" Padding="0" FontSize="15" />
-                <Button Grid.Row="5" Grid.Column="4" Margin="1" Content="-" Click="UiButton_Click" DataContext="-" Padding="0" FontSize="15" />
+                <Button Grid.Row="4" Grid.Column="3" Margin="1" Content="*" Click="UiButton_Click" DataContext="*" Padding="0" FontSize="15" ToolTip="Multiply"/>
+                <Button Grid.Row="4" Grid.Column="4" Margin="1" Content="/" Click="UiButton_Click" DataContext="/" Padding="0" FontSize="15" ToolTip="Divide. Rightclick to use fraction operator _ instead." MouseRightButtonDown="DivideButton_MouseRightButtonDown" />
+                <Button Grid.Row="5" Grid.Column="3" Margin="1" Content="+" Click="UiButton_Click" DataContext="+" Padding="0" FontSize="15" ToolTip="Add"/>
+                <Button Grid.Row="5" Grid.Column="4" Margin="1" Content="-" Click="UiButton_Click" DataContext="-" Padding="0" FontSize="15" ToolTip="Subtract"/>
 
 
                 <Grid Grid.Row="0" Grid.ColumnSpan="5" Grid.Column="0">

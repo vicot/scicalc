@@ -60,7 +60,8 @@ namespace SciCalc.Tokens.Values
 
         public override string ToString()
         {
-            return $"{this.Symbol} = {this.Value:##.####}";
+
+            return $"{this.Symbol} = {(float)this.Value}";
         }
     }
 }
