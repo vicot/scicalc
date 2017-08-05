@@ -215,12 +215,48 @@ namespace SciCalc
             switch (state)
             {
                 case ParseState.ValueInteger:
-                    return new IntegerValue(long.Parse(tokenstring));
+                    {
+                        Value token;
+                        if(long.TryParse(tokenstring, out long value))
+                        {
+                            token = new IntegerValue(value);
+                            if (token.Symbol != tokenstring)
+                            {
+                                //value was rounded
+                                token = new OutOfRangeValue(tokenstring);
+                            }
+                        }
+                        else
+                        {
+                            //value was out of range
+                            token = new OutOfRangeValue(tokenstring);
+                        }
+
+                        return token;
+                    }
 
                 case ParseState.ValueDouble:
                     {
-                        Value token = new DoubleValue(double.Parse(tokenstring, NumberStyles.Any, CultureInfo.InvariantCulture));
-                        token.InsignificantZeros = tokenstring.Length - tokenstring.LastIndexOfAny(new[] {'.', '1', '2', '3', '4', '5', '6', '7', '8', '9'}) - 1;
+                        Value token;
+                        if (double.TryParse(tokenstring, NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                        {
+                            token = new DoubleValue(value);
+                            if (token.Symbol == tokenstring)
+                            {
+                                token.InsignificantZeros = tokenstring.Length - tokenstring.LastIndexOfAny(new[] {'.', '1', '2', '3', '4', '5', '6', '7', '8', '9'}) - 1;
+                            }
+                            else
+                            {
+                                //value was rounded during parse
+                                token = new OutOfRangeValue(tokenstring);
+                            }
+
+                        }
+                        else
+                        {
+                            //value was out of range
+                            token = new OutOfRangeValue(tokenstring);
+                        }
 
                         return token;
                     }

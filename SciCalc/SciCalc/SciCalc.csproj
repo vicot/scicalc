@@ -110,6 +110,7 @@
     <Compile Include="Tokens\TokenType.cs" />
     <Compile Include="Tokens\Values\DoubleValue.cs" />
     <Compile Include="Tokens\Values\IntegerValue.cs" />
+    <Compile Include="Tokens\Values\OutOfRangeValue.cs" />
     <Compile Include="Tokens\Values\Value.cs" />
     <Page Include="EditConstDialog.xaml">
       <SubType>Designer</SubType>

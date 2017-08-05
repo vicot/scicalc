@@ -33,12 +33,14 @@ namespace SciCalc.Tokens.Values
             set => this.Symbol+=new string('0', value);
         }
 
-        protected Value(double value) : base(value.ToString(CultureInfo.InvariantCulture))
+        protected Value(double value) : base("")
         {
             this.Priority = 0;
             this.ArgumentCount = 0;
             this.TokenType = TokenType.Value;
             this.Value = value;
+
+            this.Symbol = value.ToString("0." + new string('#', 300), CultureInfo.InvariantCulture);
 
             // values can bind with constants on the right, such as "2PI" and operators or functions (with auto * operator) on both ends
             // also, values can stand by themselves, without anything on the left or right
