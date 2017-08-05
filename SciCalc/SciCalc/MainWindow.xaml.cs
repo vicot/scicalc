@@ -356,8 +356,8 @@ namespace SciCalc
         /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
         private void ConstantsListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            Constant c = this.ConstantsListBox.SelectedItem as Constant;
-            if (c != null)
+            //Constant c = this.ConstantsListBox.SelectedItem as Constant;
+            if (this.ConstantsListBox.SelectedItem is Constant c)
             {
                 this.ProcessKeyInput(c.Symbol);
             }
@@ -392,8 +392,7 @@ namespace SciCalc
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void RemoveValueButton_Click(object sender, RoutedEventArgs e)
         {
-            Constant c = this.ConstantsListBox.SelectedItem as Constant;
-            if (c != null)
+            if (this.ConstantsListBox.SelectedItem is Constant c)
             {
                 this.parser.UnsetConstant(c.Symbol);
                 this.constants.Remove(c);
@@ -456,8 +455,7 @@ namespace SciCalc
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void MenuItemEdit_Click(object sender, RoutedEventArgs e)
         {
-            Constant c = this.ConstantsListBox.SelectedItem as Constant;
-            if (c != null)
+            if (this.ConstantsListBox.SelectedItem is Constant c)
             {
                 var dialog = new EditConstDialog(c.Symbol, c.Value) {Owner = this};
                 bool result = dialog.ShowDialog() ?? false;
