@@ -57,6 +57,7 @@ namespace SciCalc
             {
                 this.MinWidth = this.ActualWidth;
                 this.MinHeight = this.ActualHeight;
+                this.SizeToContent = SizeToContent.Manual;
             };
         }
 
