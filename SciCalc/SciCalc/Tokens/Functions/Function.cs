@@ -47,5 +47,7 @@ namespace SciCalc.Tokens.Functions
                 typeof(ParentOperator)
             };
         }
+
+        public override string ErrorMessage => $"Unknown function '{this.Symbol}'";
     }
 }

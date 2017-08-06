@@ -328,14 +328,14 @@ namespace SciCalc
                         key = char.ToUpperInvariant(key);
                     }
 
-                    if (key == ',')
-                    {
-                        //replace comma with dot, for languages that use comma as floating point
-                        key = '.';
-                    }
-
                     this.ProcessKeyInput(key);
                     return;
+                }
+
+                if (key == ',')
+                {
+                    //replace comma with dot, for languages that use comma as floating point
+                    key = '.';
                 }
 
                 //if not letter, process as-is

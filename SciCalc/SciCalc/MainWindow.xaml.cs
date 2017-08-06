@@ -78,7 +78,7 @@ namespace SciCalc
         private void SaveHistory(double result)
         {
             this.parser.SetConstant("ANS", result);
-            this.history.Add(new HistoryEntry(this.Expression, result));
+            this.history.Insert(0, new HistoryEntry(this.Expression, result));
         }
 
         /// <summary>
@@ -451,7 +451,7 @@ namespace SciCalc
         {
             this.ExpressionParagraph.Inlines.Clear();
             this.ResultsBox.Text = "";
-            this.parser.UnsetConstant("ANS");
+            this.ReformatExpression();
         }
 
         /// <summary>
