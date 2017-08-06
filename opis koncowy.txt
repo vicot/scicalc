@@ -1,0 +1,67 @@
+Projekt SciCalc - kalkulator naukowy, wykonany w ramach Akademii C# 2017
+
+Link do prezentacji: https://youtu.be/fEyxmCuItHA
+
+Zastosowane technologie: WPF
+Projekt spełnia założenia spisane w pliku "wstepny opis.txt"
+
+Opis rozwiązania:
+
+* Parser
+- Wykonany był z wykorzystaniem techniki Test Driven Development (TDD). W projekcie SciCalc.Tests są unittesty (wykonane w NUnit) weryfikujące poprawność wszystkich operatorów, funkcji jak i samego parsowania.
+- Hierarchia klas dla Token'ów:
+   - Token = klasa abstrakcyjna będąca bazą dla wszystkich tokenów
+   - Value = grupa tokenów reprezentujących konkretne wartości:
+      - IntegerValue    = liczba całkowita (mieszcząca się w long)
+      - DoubleValue     = liczba rzeczywista (mieszcząca się w double)
+      - OutOfRangeValue = błędny token z liczbą której nie możemy w całości przechować w jednym z 2 powyższych typów
+   - Constant = token reprezentujący stałą, w przecieństwie do Value, reprezentowany jest przez nazwę a nie wartość
+   - Operator = grupa tokenów reprezentujących operatory
+      - SumOperator, SubOperator, MulOperator, ... = tokeny reprezentujące konkretny operator. Implementują metodę execute która zwraca wynik działania z danym operatorem
+      - ExcessiveDotToken = specjalny token oznaczający nadmiarowe kropki w wyrażeniu (np. 123.456.789)
+      - ParentOperator, CloseParentOperator = tokeny nawiasów
+   - Function = grupa tokenów reprezentujących funkcje
+      - SinFunction, LogFunction, ... = tokeny reprezentujące konkretną funkcję. Implementują metodę execute która zwraca wartość funkcji dla zadanych argumentów
+- Każdy Token posiada:
+   - symbol (do wyświetlania na ekranie)
+   - listę typów Tokenów które akceptuje po lewej i po prawej stronie
+   - informację o wymaganiu odstępu po lewej lub prawej stronie (w celu autoformatowania wyrażenia)
+   - właściwość IsValid określającą czy token jest poprawny. Jeśli nie to jest rysowany na czerwono i powoduje błąd przy próbie obliczenia wyniku. Powodem niepoprawności tokenu mogą być:
+      - wartość spoza zakresu
+      - powiązanie ze złym tokenem (np. 2 operatory dodawania obok siebie)
+      - niezdefiniowana stała
+      - nieznana funkcja lub operator
+   - ErrorMessage zawierający treść błędu który pojawi się na ekranie w przypadku gdy dany token był niepoprawny.
+   - priorytet, dla operatorów
+   - metody Execute jedno lub dwu-parametrowe zwracajce wynik operatora lub funkcji
+   - metody porównawcze (Equals i operator==)  porównujące: typ, wartość, symbol i ilość argumentów
+
+- Działanie parsera:
+   - Pierwszym krokiem jest parsowanie wyrażenia w postaci string do listy Token'ów. Dokonuje tego analizując kolejne znaki, w momencie gdy stwierdzi, że token się skończył (koniec wejścia lub zmiana typu) tworzy na podstawie substringu właściwy token:
+      - liczba - Value
+      - WIELKIELITERY - Constant
+      - malelitery - Function
+      - reszta (symbole) - Operator
+   - Drugim krokiem jest uzupełnienie powyższej listy o operatory mnożenia pomiędzy pewnymi tokenami, co pozwala na skrócony zapis postaci 2PI (jako 2*PI) czy (X+1)(X-1) z niejawnym mnożeniem pomiędzy nawiasami.
+   - Następnie dokonowyana jest konwersja listy Token'ów na Odwrotną Notację Polską (ang. RPN - reverse polish notation). Implementuję tutaj algorytm Shunting-yard ( https://en.wikipedia.org/wiki/Shunting-yard_algorithm ). 
+   - Kolejnym, ostatnim krokiem jest obliczenie wyniku wyrażenia korzystając z otrzymanej wcześniej listy Token'ów w postaci postfix (ONP). Na tym etapie algorytm rozwiązywania ONP jest trywialnie rozwiązywalny z zastosowaniem stosu. Kolejne liczby są wrzucane na stos, a gdy trafimy an Token funkcyjny (operator lub funkcja) ściągamy ze stosu odpowiednią ilość argumentów i wrzucamy z powrotem wynik działania. Na końcu powinniśmy zostać z 1 liczbą na stosie - wynikiem całego wyrażenia.
+
+ - Interfejs graficzny:
+    - W całości wykonany w technologii WPF
+    - Nie licząc małego okienka na wpisywanie nazwy i wartości dla stałej, całość mieści się w MainWindow
+    - MainWindow został podzielony na 2 pliki (partial class), w MainWindow.InputManager.cs jest wydzielona część odpowiadająca za obsługę klawiatury
+    - Klasa MainWindow nasłuchuje na eventach PreviewKeyDown i PreviewKeyInput w celu przechwycenia wszystkich klawiszy, zanim zostaną pochłonięte przez wewnętrzne kontrolki
+       - Obsługuję również kilka klawiszy specjalnych, Ctrl-c i Ctrl-v do kopiowania wyniku lub zaznaczonego fragmentu wyrazenia, i wklejania treści do wyrażenia, oraz Ctrl-r wpisujący symbol pierwiastka
+    - Widok wyrażenia jest oparty na kontrolce RichTextBox i budowany z mojej implementacji klasy TokenRun (rozszerzającej wbudowany Run). Ze względów technicznych, pozycjonowanie kursora, jak i samo jego wyświetlanie (migający kursor | ) jest wykonywane ręcznie i nie korzysta z implementacji RichTextBox'a, z wyjątkiem obsługi myszy.
+    - Wpisywanie wyrażenia odbywa się znak po znaku (nawet jeśli wkleimy kilka znaków jednocześnie). Po każdym znaku wyrażenie jest parsowane do listy tokenów i autoformatowane na ich podstawie (każdy typ tokenu ma swój kolor, a tokeny nieprawidłowe są oznaczone na czerowno. Dodatkowo wpisywane są odstępy między tokenami zgodnie z konfiguracją)
+    - Interfejs podzielony jest na 4 części:
+       - Widok wyrażenia i wyniku
+       - Modyfikowalna lista stałych dostępnych w wyrażeniu (przyciski i menu kontekstowe)
+       - Przyciski akcji. Wszystkie operatory, funkcje i cyfry obsługiwane przez kalkulator mają odpowiedni przycisk. Większość przycisków ma też tooltip wyświetlający się po najechaniu kursorem myszy.
+       - Historia działan, z możliwością załadowania wcześniej użytego wyrażenia
+    - Wynik ostatniego działania jest automatycznie zapisywany jako stała ANS, dostępna do wykorzystania w kolejnych obliczeniach
+    - Kilka operatorów korzysta z niestandardowego symbolu:
+       - Operator modulo to #, ponieważ % jest zajęty dla operatora procent (operator unarny, dzielący swój argument przez 100)
+       - Operator ułamków to _, jest on analogiczny do zwykłego dzielnia, ale ma większy priorytet. Np. 1_2/3_4 jest jednoznaczny z (1/2) / (3/4) czyli 3/2
+       - Operator pierwiastka korzysta z symbolu unicode √. Może być unarny (pierwiastek kwadratowy √4) lub binarny w postaci n√x, gdzie n jest liczbą określającą stopień pierwiastka
+       - Funkcja log ma specjalny format w postaci logn(x) gdzie n jest liczbą oznaczającą podstawę logarytmu, np log3(9) = 2
