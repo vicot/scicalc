@@ -1,6 +1,6 @@
 Projekt SciCalc - kalkulator naukowy, wykonany w ramach Akademii C# 2017
 
-Link do prezentacji: https://youtu.be/fEyxmCuItHA
+Link do prezentacji: https://youtu.be/fEyxmCuItHA (5:44, ale mówię dosyć wolno i 1.25 lub 1.5x speed można spokojnie oglądać)
 
 Zastosowane technologie: WPF
 Projekt spełnia założenia spisane w pliku "wstepny opis.txt"
